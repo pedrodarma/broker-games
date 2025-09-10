@@ -56,7 +56,7 @@ server.on('upgrade', (request, socket, head) => {
 	}
 });
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8070;
 server.listen(port, () => {
 	// eslint-disable-next-line no-console
 	console.warn(`Server listening on port ${port}`);
