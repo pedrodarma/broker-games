@@ -3,7 +3,7 @@ FROM node:${NODE_VERSION}-alpine as base
 
 WORKDIR /app
 COPY . .
-RUN rm -rf node_modules package-lock.json dist _website
+RUN rm -rf node_modules package-lock.json dist _website yarn.lock
 RUN ls -la
 
 FROM base as build
@@ -36,4 +36,4 @@ COPY --from=build /app/node_modules /app/node_modules
 
 CMD [ "yarn", "start" ]
 
-EXPOSE 8080
+EXPOSE 8070
