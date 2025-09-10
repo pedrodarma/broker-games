@@ -15,7 +15,7 @@ services:
       - '8080:8080' # Expose port 8080 on the host
     networks:
       default_bridge:
-        ipv4_address: 172.300.0.10
+        ipv4_address: 172.250.0.10
 
 networks:
   default_bridge:
