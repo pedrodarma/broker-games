@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  app:
+    image: ghcr.io/pedrodarma/broker-games/broker-games:main
+    container_name: broker-games
+    environment:
+      - NODE_ENV=production
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-1118}
+      - REDIS_USERNAME=${REDIS_USERNAME:-admin}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-default}
+    restart: unless-stopped # options: always, unless-stopped, on-failure
+    ports:
+      - '8080:8080' # Expose port 8080 on the host
+    networks:
+      default_bridge:
+        ipv4_address: 172.300.0.10
+
+networks:
+  default_bridge:
+    external: true
+    name: games-network # Use the default bridge network driver

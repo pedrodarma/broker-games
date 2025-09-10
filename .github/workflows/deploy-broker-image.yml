@@ -1,0 +1,49 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    env:
+      REDIS_HOST: ${ { secrets.REDIS_HOST } }
+      REDIS_PORT: ${ { secrets.REDIS_PORT } }
+      REDIS_USERNAME: ${ { secrets.REDIS_USERNAME } }
+      REDIS_PASSWORD: ${ { secrets.REDIS_PASSWORD } }
+
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Install
+        uses: actions/setup-node@v5
+        with:
+          node-version: 20.x
+
+      - name: Build Project
+        run: |
+          yarn install --frozen-lockfile
+          yarn build
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker image
+        run: |
+          REPO_LOWER=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+          BRANCH_NAME=$(echo ${{ github.ref_name }} | tr '[:upper:]' '[:lower:]') # Get the branch name in lowercase
+          docker build --build-arg REDIS_HOST=${{ secrets.REDIS_HOST }} --build-arg REDIS_PORT=${{ secrets.REDIS_PORT }} --build-arg REDIS_USERNAME=${{ secrets.REDIS_USERNAME }} --build-arg REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }} . -t ghcr.io/$REPO_LOWER/broker-games:$BRANCH_NAME
+
+      - name: Push Docker image to GitHub Packages
+        run: |
+          REPO_LOWER=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')
+          BRANCH_NAME=$(echo ${{ github.ref_name }} | tr '[:upper:]' '[:lower:]') # Get the branch name in lowercase
+          docker push ghcr.io/$REPO_LOWER/broker-games:$BRANCH_NAME

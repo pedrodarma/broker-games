@@ -1,0 +1,66 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  "prettier.useEditorConfig": false,
+  "prettier.useTabs": true,
+  "prettier.configPath": ".prettierrc.json",
+  "javascript.preferences.quoteStyle": "single",
+  "typescript.preferences.quoteStyle": "single",
+  "prettier.singleQuote": true,
+  "editor.tabSize": 2,
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.rulers": [
+      {
+        "column": 80,
+        "color": "#ff00FF"
+      }
+      // 100 // <- a ruler in the default color or as customized (with "editorRuler.foreground") at column 100
+      // {
+      // 	"column": 120,
+      // 	"color": "#ff0000"
+      // }
+    ]
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.rulers": [
+      {
+        "column": 80,
+        "color": "#ff00FF"
+      }
+      // 100 // <- a ruler in the default color or as customized (with "editorRuler.foreground") at column 100
+      // {
+      // 	"column": 120,
+      // 	"color": "#ff0000"
+      // }
+    ]
+  },
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "workbench.editor.enablePreview": false,
+  "search.exclude": {
+    "**/yarn.lock": true,
+    "**/package-lock.json": true,
+    "**/node_modules": true,
+    "**/Podfile": true,
+    "**/Podfile.lock": true,
+    "**/*.svg": true,
+    "**/*.storyboard": true,
+    "**/responses": true,
+    // "**/.git": true,
+    // "**/.styles.ts.html": true,
+    // "**/node_modules": true,
+    // "**/lcov-report": true,
+    // "**/tests/coverage": true,
+    // "**/coverage": true,
+    "**/__snapshots__": true
+  },
+  "files.exclude": {
+    "**/dist": true,
+    // "**/coverage": true,
+    "**/__snapshots__": true
+  }
+}
