@@ -12,7 +12,7 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD:-default}
     restart: unless-stopped # options: always, unless-stopped, on-failure
     ports:
-      - '8080:8080' # Expose port 8080 on the host
+      - '8070:8070' # Expose port 8070 on the host
     networks:
       default_bridge:
         ipv4_address: 172.250.0.10
