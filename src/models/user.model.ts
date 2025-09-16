@@ -10,8 +10,8 @@ import { WebSocket } from 'ws';
  * <br/>&nbsp;<br/>
  */
 export interface User {
-	username: string;
 	id: string;
+	username: string;
 	avatar?: string;
 	client: WebSocket;
 	createdAt: Date;

@@ -1,3 +1,4 @@
+import { WebSocket } from 'ws';
 import { Game } from './game.model';
 import { BrokerServer } from './broker-server.model';
 
@@ -57,6 +58,7 @@ export interface GameRoom extends Game {
  */
 interface Player {
 	userId: UserId;
+	client: WebSocket;
 	data: DataValue;
 }
 

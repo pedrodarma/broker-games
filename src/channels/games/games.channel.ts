@@ -21,7 +21,7 @@ export class GamesChannel {
 		global.games[hash].socketChannel.broadcast = _broadcast;
 
 		global.games[hash].socketChannel.on('connection', (ws, req) => {
-			// const user = _addNewUser({ ws, req });
+			const user = _addNewUser({ ws, req });
 
 			ws.on('error', (error) =>
 				_onError({ error, restart: () => GamesChannel.initialize(hash) }),
@@ -47,6 +47,12 @@ export class GamesChannel {
 }
 
 function _broadcast(message: WebSocketMessage) {
+	global.games[message.from].socketChannel.clients.forEach((client) => {
+		if (client.readyState === client.OPEN) {
+			client.send(JSON.stringify(message));
+		}
+	});
+
 	// const users = Object.values(global.users);
 	// users.forEach((user) => {
 	// 	user.client.send(JSON.stringify(message));

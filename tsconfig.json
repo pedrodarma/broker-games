@@ -13,6 +13,9 @@
       "@constants": [
         "./src/_constants"
       ],
+      "@constants/game_types": [
+        "./src/_constants/_games"
+      ],
       "@channels": [
         "./src/channels"
       ],

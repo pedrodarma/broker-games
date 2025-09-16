@@ -53,8 +53,13 @@ export class ChatChannel {
 }
 
 function _broadcast(message: WebSocketMessage) {
-	const users = Object.values(global.users);
-	users.forEach((user) => {
-		user.client.send(JSON.stringify(message));
+	global.globalChatChannel.clients.forEach((client) => {
+		if (client.readyState === client.OPEN) {
+			client.send(JSON.stringify(message));
+		}
 	});
+	// const users = Object.values(global.users);
+	// users.forEach((user) => {
+	// 	user.client.send(JSON.stringify(message));
+	// });
 }

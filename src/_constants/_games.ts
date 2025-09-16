@@ -2,41 +2,43 @@ import { Game } from '@models';
 
 type GamesType = Record<string, string>;
 type DefaultGame = Omit<Game, 'id'>;
-type Games = DefaultGame[];
+// type Games = DefaultGame[];
 
-const _gameNames: GamesType = {
-	CHESS: 'Chess',
-	NAVAL_BATTLE: 'Naval Battle',
-	POKER: 'Poker',
+const _games = {
+	/** Naval Battle */
+	NBT: 'Naval Battle',
+	/** Rock Paper Scissors */
 	RPS: 'Rock Paper Scissors',
-	TICTACTOE: 'Tic Tac Toe',
-	CARNAVAL: 'Carnaval',
+	/** Quick Tac Toe */
+	QTT: 'Quick Tac Toe',
+	/** Carnaval World */
+	CNW: 'Carnaval World',
 };
 
-export const games: Games = [
-	{
-		name: _gameNames.NAVAL_BATTLE,
+export type GameIDs = keyof typeof _games;
+type Games = { [key in GameIDs]: DefaultGame };
+
+// export type { GameIDs, DefaultGame };
+
+export const games: Record<GameIDs, DefaultGame> = {
+	NBT: {
+		name: _games.NBT,
 		maxPlayers: 2,
 		minPlayers: 2,
-		// images: {
-		// 	thumbnail: 'https://i.ibb.co/0j3m0ZV/naval-battle-thumb.png',
-		// 	banner: 'https://i.ibb.co/7G8m2vD/naval-battle-banner.png',
-		// 	screenshots: [
-		// 		'https://i.ibb.co/0j3m0ZV/naval-battle-thumb.png',
-		// 		'https://i.ibb.co/7G8m2vD/naval-battle-banner.png',
-		// 	],
-		// },
 	},
-];
-
-// const navalRules = {
-// 	gridSize: 10,
-// 	shipTypes: [
-// 		{ name: 'Carrier', size: 5, count: 1 },
-// 		{ name: 'Battleship', size: 4, count: 1 },
-// 		{ name: 'Cruiser', size: 3, count: 1 },
-// 		{ name: 'Submarine', size: 3, count: 1 },
-// 		{ name: 'Destroyer', size: 2, count: 1 },
-// 	],
-// 	maxTurns: 100,
-// };
+	RPS: {
+		name: _games.RPS,
+		maxPlayers: 2,
+		minPlayers: 2,
+	},
+	QTT: {
+		name: _games.QTT,
+		maxPlayers: 2,
+		minPlayers: 2,
+	},
+	CNW: {
+		name: _games.CNW,
+		maxPlayers: 10,
+		minPlayers: 2,
+	},
+};

@@ -19,7 +19,8 @@ app.use('/', router);
 const _chatChannel = ChatChannel.initialize();
 
 server.on('upgrade', (request, socket, head) => {
-	const { pathname } = new URL(request.url ?? '');
+	// const { pathname } = new URL(request.url ?? '');
+	const pathname = request.url;
 
 	// eslint-disable-next-line no-console
 	console.log({ pathname });
@@ -29,15 +30,19 @@ server.on('upgrade', (request, socket, head) => {
 		return;
 	}
 
-	if (pathname === '/chat') {
+	if (pathname?.startsWith('/chat')) {
 		_chatChannel.handleUpgrade(request, socket, head, (ws) => {
 			_chatChannel.emit('connection', ws, request);
 		});
 		return;
 	}
 
+	/**
+	 * /games/:hash?player=playerId to play
+	 * /games/:hash to watch
+	 */
 	if (pathname?.startsWith('/game/')) {
-		const hash = pathname.split('/game/')[1];
+		const hash = pathname.split('/game/')[1]?.split('?')[0];
 
 		if (global.games[hash] === undefined) {
 			socket.destroy();

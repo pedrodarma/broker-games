@@ -27,6 +27,12 @@ export function _onMessage({ user, text }: Props) {
 
 			if (message && message.type) {
 				switch (message.type.toLowerCase()) {
+					case 'chat':
+						global.globalChatChannel.broadcast?.(message);
+
+						// eslint-disable-next-line no-console
+						// console.log(message);
+						break;
 					case 'log':
 						// eslint-disable-next-line no-console
 						// console.log(message);

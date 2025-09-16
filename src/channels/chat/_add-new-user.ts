@@ -9,7 +9,8 @@ interface Props {
 }
 
 export function _addNewUser({ ws, req }: Props): User {
-	const id = IDUtils.generate();
+	const userId = req.url?.split('user=')[1]?.split('&')[0];
+	const id = userId ?? IDUtils.generate();
 
 	const user: User = {
 		id,

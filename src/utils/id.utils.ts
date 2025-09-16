@@ -6,19 +6,46 @@ import { v4 as uuidv4 } from 'uuid';
  *
  * A utility object for generating unique identifiers (UUIDs).
  *
- * - `generate()`: Generates a new UUID (version 4).
+ * - `generate()` => `3b12f1df-5232-4e3c-9e6b-8f9e5f1c2d3e`
+ * - `generateShortID()` => `5232-9e6b`
  *
- * Example:
- * ```typescript
- * const newId = IDUtils.generate();
- * console.log(newId); // Outputs a unique UUID, e.g., "3b12f1df-5232-4e3c-9e6b-8f9e5f1c2d3e"
- * ```
  * ---
  * <br/>&nbsp;<br/>
  */
-export const IDUtils = {
+export const IDUtils: IDUtils = {
 	generate: () => uuidv4(),
+	generateShortID: _generateShortID,
 };
+
+interface IDUtils {
+	/**
+	 * ---
+	 *
+	 * Generates a new unique identifier (UUID).
+	 *
+	 * ```typescript
+	 * IDUtils.generate(); // e.g., "3b12f1df-5232-4e3c-9e6b-8f9e5f1c2d3e"
+	 * ```
+	 */
+	generate: () => string;
+	/**
+	 * ---
+	 *
+	 * Generates a short unique identifier.
+	 *
+	 * ```typescript
+	 * IDUtils.generateShortID(); // e.g., "5232-9e6b"
+	 * ```
+	 */
+	generateShortID: () => string;
+}
+
+function _generateShortID() {
+	const uuid = uuidv4(); // "3b12f1df-5232-4e3c-9e6b-8f9e5f1c2d3e"
+	const splited = uuid.split('-'); // [ '3b12f1df', '5232', '4e3c', '9e6b', '8f9e5f1c2d3e' ]
+	const short = `${splited[1]}-${splited[3]}`; // "5232-9e6b"
+	return short;
+}
 // export class ID {
 // 	static generate() {
 // 		return uuidv4();
