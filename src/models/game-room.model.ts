@@ -56,7 +56,7 @@ export interface GameRoom extends Game {
  * ---
  * <br/>&nbsp;<br/>
  */
-interface Player {
+export interface Player {
 	userId: UserId;
 	client: WebSocket;
 	data: DataValue;
@@ -92,4 +92,5 @@ type GameRoomStatus = 'waiting' | 'playing' | 'finished';
  */
 type UserId = string;
 
-type DataValue = string | number | boolean | null | undefined | object;
+// type DataValue = string | number | boolean | null | undefined | object;
+type DataValue = Record<string, any>;

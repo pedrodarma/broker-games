@@ -1,3 +1,4 @@
+import express from 'express';
 import { Router } from 'express';
 import GameRoomController from './contollers/game_room';
 import GamesController from './contollers/games';
@@ -48,7 +49,7 @@ router.get('/', async (req, res) => {
 
 router.get('/healthcheck', (req, res) => res.sendStatus(200));
 
-router.post('/game/create', GameRoomController.create);
+router.post('/game/create', express.json(), GameRoomController.create);
 
 router.get('/games', GamesController.list);
 router.get('/games/live', GamesController.listLive);

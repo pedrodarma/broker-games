@@ -9,19 +9,19 @@ export class GameRoomController {
 		try {
 			const hash = IDUtils.generate();
 
-			if (!req.params.gameId && !req.query.gameId) {
+			if (!req.params.gameId && !req.query.gameId && !req.body.gameId) {
 				return res.status(400).json({ error: 'Game ID is required' });
 			}
 
-			const gameId = req.query.gameId || req.params.gameId;
+			const gameId = req.query.gameId || req.params.gameId || req.body.gameId;
 			const gameKey = String(gameId) as keyof typeof games;
 
 			const game = games[gameKey];
-			const id = Number(gameId);
+			// const id = Number(gameId);
 
 			global.games[hash] = {
 				...game,
-				id,
+				id: gameId,
 				hash: hash,
 				players: {},
 				watchers: [],
@@ -34,10 +34,10 @@ export class GameRoomController {
 				updatedAt: new Date(),
 			};
 
-			global.games[hash].socketChannel = GamesChannel.initialize(hash);
+			GamesChannel.initialize(hash);
 
 			return res.status(200).json({ id: hash });
-		} catch (error) {
+		} catch {
 			return res.status(500).json({ error: 'Internal server error' });
 		}
 	}

@@ -1,13 +1,35 @@
 import { WebSocketMessage } from '@models';
 
-const QuickTacToeGame = {
+export const QuickTacToeGame = {
 	// name: 'Quick Tac Toe',
+	handleMessage: _handleMessage,
 };
 
-async function _handleMessage(message: WebSocketMessage) {
+async function _handleMessage(hash: string, message: WebSocketMessage) {
 	// Handle incoming messages from players
 	switch (message.type) {
 		case 'action':
+			if (message.data.action === 'move') {
+				// Process the move action
+				// e.g., update game state, check for win conditions, etc.
+				// Then broadcast the updated state to all players
+				global.games[hash].socketChannel.broadcast?.(message);
+
+				Object.values(global.games[hash].players)
+					.filter((p) => p.userId !== message.from)
+					.forEach((player) => {
+						player.client.send(
+							JSON.stringify({
+								type: 'event',
+								from: hash,
+								to: player.userId,
+								data: {
+									event: 'your_turn',
+								},
+							}),
+						);
+					});
+			}
 			break;
 
 		default:

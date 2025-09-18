@@ -19,7 +19,6 @@ app.use('/', router);
 const _chatChannel = ChatChannel.initialize();
 
 server.on('upgrade', (request, socket, head) => {
-	// const { pathname } = new URL(request.url ?? '');
 	const pathname = request.url;
 
 	// eslint-disable-next-line no-console

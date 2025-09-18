@@ -22,6 +22,9 @@
       "@controllers": [
         "./src/controllers"
       ],
+      "@games": [
+        "./src/games"
+      ],
       // "@cron": [
       //   "./src/cron"
       // ],

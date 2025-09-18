@@ -1,6 +1,6 @@
 import { Game } from '@models';
 
-type GamesType = Record<string, string>;
+// type GamesType = Record<string, string>;
 type DefaultGame = Omit<Game, 'id'>;
 // type Games = DefaultGame[];
 
@@ -16,7 +16,7 @@ const _games = {
 };
 
 export type GameIDs = keyof typeof _games;
-type Games = { [key in GameIDs]: DefaultGame };
+// type Games = { [key in GameIDs]: DefaultGame };
 
 // export type { GameIDs, DefaultGame };
 

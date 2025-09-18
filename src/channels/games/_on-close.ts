@@ -1,12 +1,20 @@
 import '../../globals';
-import { User } from '../../models';
+import { Player } from '@models';
 
 interface ServerCloseProps {
+	hash: string;
 	restart: () => void;
 }
 
-export function _onServerClose({ restart }: ServerCloseProps) {
-	// global.usersChannel.close();
+export function _onServerClose({ hash, restart }: ServerCloseProps) {
+	global.games[hash].socketChannel.close();
+
+	// eslint-disable-next-line no-console
+	console.log('====================================');
+	// eslint-disable-next-line no-console
+	console.log('SERVER CLOSE: ', hash);
+	// eslint-disable-next-line no-console
+	console.log('====================================');
 
 	setTimeout(() => {
 		restart();
@@ -14,27 +22,26 @@ export function _onServerClose({ restart }: ServerCloseProps) {
 }
 
 interface ClientCloseProps {
-	user?: User;
+	hash: string;
+	player: Player;
 }
 
-export function _onClientClose({ user }: ClientCloseProps) {
-	// user.client.close();
-	// // eslint-disable-next-line no-console
-	// console.log(`User ${user.id} disconnected`);
-	// // eslint-disable-next-line no-console
-	// console.log(`User ${user.id} closed`);
-	// // eslint-disable-next-line no-console
-	// console.log('====================================');
+export function _onClientClose({ hash, player }: ClientCloseProps) {
+	player.client.close();
+	// eslint-disable-next-line no-console
+	console.log(`Player ${player.userId} disconnected`);
+	// eslint-disable-next-line no-console
+	console.log(`Player ${player.userId} closed`);
+	// eslint-disable-next-line no-console
+	console.log('====================================');
 	// delete global.users[user.id];
-	// setTimeout(() => {
-	// 	global.usersChannel.broadcast
-	// 		? global.usersChannel.broadcast({
-	// 				type: 'event',
-	// 				from: user.id,
-	// 				data: {
-	// 					event: 'user_disconnected',
-	// 				},
-	// 			})
-	// 		: undefined;
-	// }, 1000);
+	setTimeout(() => {
+		global.games[hash].socketChannel.broadcast?.({
+			type: 'event',
+			from: player.userId,
+			data: {
+				event: 'user_disconnected',
+			},
+		});
+	}, 1000);
 }

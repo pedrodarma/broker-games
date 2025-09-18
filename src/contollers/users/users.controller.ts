@@ -5,13 +5,13 @@ export class UsersController {
 		const _users = Object.values(global.users);
 
 		const user = _users
-			.map((user) => {
+			.map((u) => {
 				return {
-					id: user.id,
-					name: user.username,
-					avatar: user.avatar,
-					createdAt: user.createdAt,
-					updatedAt: user.updatedAt,
+					id: u.id,
+					username: u.username,
+					avatar: u.avatar,
+					createdAt: u.createdAt,
+					updatedAt: u.updatedAt,
 				};
 			})
 			.find((u) => u.id === req.params.userId);
@@ -25,7 +25,7 @@ export class UsersController {
 		const users = _users.map((user) => {
 			return {
 				id: user.id,
-				name: user.username,
+				username: user.username,
 				avatar: user.avatar,
 				createdAt: user.createdAt,
 				updatedAt: user.updatedAt,

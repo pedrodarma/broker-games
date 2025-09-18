@@ -18,24 +18,28 @@ export class GamesChannel {
 			skipUTF8Validation: true,
 		});
 
-		global.games[hash].socketChannel.broadcast = _broadcast;
+		global.games[hash].socketChannel.broadcast = (message: WebSocketMessage) =>
+			_broadcast(hash, message);
 
 		global.games[hash].socketChannel.on('connection', (ws, req) => {
-			const user = _addNewUser({ ws, req });
+			const player = _addNewUser({ ws, req });
+
+			if (player === undefined) {
+				ws.close();
+				return;
+			}
 
 			ws.on('error', (error) =>
 				_onError({ error, restart: () => GamesChannel.initialize(hash) }),
 			);
 
-			// ws.on('message', (text) => _onMessage({ user, text: text }));
-			ws.on('message', (text) => _onMessage({ text: text }));
+			ws.on('message', (text) => _onMessage({ hash, player, text: text }));
 
-			// ws.on('close', () => _onClientClose({ user }));
-			ws.on('close', () => _onClientClose({}));
+			ws.on('close', () => _onClientClose({ hash, player }));
 		});
 
 		global.games[hash].socketChannel.on('close', () =>
-			_onServerClose({ restart: () => GamesChannel.initialize(hash) }),
+			_onServerClose({ hash, restart: () => GamesChannel.initialize(hash) }),
 		);
 
 		global.games[hash].socketChannel.on('error', (error) =>
@@ -46,15 +50,10 @@ export class GamesChannel {
 	}
 }
 
-function _broadcast(message: WebSocketMessage) {
-	global.games[message.from].socketChannel.clients.forEach((client) => {
+function _broadcast(hash: string, message: WebSocketMessage) {
+	global.games[hash]?.socketChannel?.clients?.forEach((client) => {
 		if (client.readyState === client.OPEN) {
 			client.send(JSON.stringify(message));
 		}
 	});
-
-	// const users = Object.values(global.users);
-	// users.forEach((user) => {
-	// 	user.client.send(JSON.stringify(message));
-	// });
 }

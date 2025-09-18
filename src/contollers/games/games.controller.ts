@@ -15,7 +15,7 @@ export class GamesController {
 					minPlayers: game.minPlayers,
 				})),
 			);
-		} catch (error) {
+		} catch {
 			return res.status(500).json({ error: 'Internal server error' });
 		}
 	}
@@ -27,6 +27,7 @@ export class GamesController {
 			return res.status(200).json(
 				_games.map((game) => ({
 					id: game.id,
+					hash: game.hash,
 					name: game.name,
 					createdAt: game.createdAt,
 					updatedAt: game.updatedAt,
@@ -37,7 +38,7 @@ export class GamesController {
 					minPlayers: game.minPlayers,
 				})),
 			);
-		} catch (error) {
+		} catch {
 			return res.status(500).json({ error: 'Internal server error' });
 		}
 	}

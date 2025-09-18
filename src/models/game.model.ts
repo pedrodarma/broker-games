@@ -10,7 +10,7 @@
  * <br/>&nbsp;<br/>
  */
 export interface Game {
-	id: number;
+	id: string;
 	name: string;
 	// images: GameImages;
 	// data: Record<string, DataValue>;
@@ -40,10 +40,10 @@ export interface Game {
  * ---
  * <br/>&nbsp;<br/>
  */
-interface GameImages {
-	thumbnail: string;
-	banner: string;
-	screenshots: string[];
-}
+// interface GameImages {
+// 	thumbnail: string;
+// 	banner: string;
+// 	screenshots: string[];
+// }
 
-type DataValue = string | number | boolean | null | undefined | object;
+// type DataValue = string | number | boolean | null | undefined | object;
