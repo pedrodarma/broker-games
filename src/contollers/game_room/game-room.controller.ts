@@ -5,9 +5,31 @@ import { WebSocketServer } from 'ws';
 import { GamesChannel } from '@channels';
 
 export class GameRoomController {
+	static async get(req: Request, res: Response) {
+		try {
+			const hash = req.params.hash || req.query.hash || req.body.hash;
+
+			if (!hash || typeof hash !== 'string') {
+				return res
+					.status(400)
+					.json({ error: 'Invalid or missing game room hash' });
+			}
+
+			const gameRoom = global.games[hash];
+
+			if (!gameRoom) {
+				return res.status(404).json({ error: 'Game room not found' });
+			}
+
+			return res.status(200).json(gameRoom);
+		} catch {
+			return res.status(500).json({ error: 'Internal server error' });
+		}
+	}
+
 	static async create(req: Request, res: Response) {
 		try {
-			const hash = IDUtils.generate();
+			const hash = IDUtils.generateShortID();
 
 			if (!req.params.gameId && !req.query.gameId && !req.body.gameId) {
 				return res.status(400).json({ error: 'Game ID is required' });

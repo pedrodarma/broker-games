@@ -36,6 +36,19 @@ export function _addNewUser({ ws, req }: Props): Player | undefined {
 				symbol: symbol,
 			},
 		};
+
+		const joinMessage: WebSocketMessage = {
+			type: 'event',
+			from: user.id,
+			to: hash,
+			data: {
+				event: 'join',
+				player: user.id,
+				players: Object.keys(global.games[hash].players),
+			},
+		};
+
+		global.games[hash].socketChannel.broadcast?.(joinMessage);
 	}
 
 	if (
@@ -53,6 +66,9 @@ export function _addNewUser({ ws, req }: Props): Player | undefined {
 		};
 
 		global.games[hash].socketChannel.broadcast?.(startGame);
+		global.games[hash].status = 'playing';
+		global.games[hash].updatedAt = new Date();
+		global.games[hash].startedAt = new Date();
 	}
 
 	return global.games[hash].players[playerId];

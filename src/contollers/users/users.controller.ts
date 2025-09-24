@@ -2,6 +2,12 @@ import { Request, Response } from 'express';
 
 export class UsersController {
 	static async get(req: Request, res: Response) {
+		if (!req.params.userId && !req.query.userId && !req.body.userId) {
+			return res.status(400).json({ error: 'Game ID is required' });
+		}
+
+		const userId = req.query.userId || req.params.userId || req.body.userId;
+
 		const _users = Object.values(global.users);
 
 		const user = _users
@@ -14,7 +20,7 @@ export class UsersController {
 					updatedAt: u.updatedAt,
 				};
 			})
-			.find((u) => u.id === req.params.userId);
+			.find((u) => u.id === userId);
 
 		return res.status(200).json(user);
 	}
