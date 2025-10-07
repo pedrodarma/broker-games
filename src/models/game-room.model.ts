@@ -39,6 +39,7 @@ export interface GameRoom extends Game {
 	 * WebSocket channel for real-time communication within the game room
 	 */
 	socketChannel: BrokerServer;
+	gameMode: GameModes;
 	createdAt: Date;
 	updatedAt: Date;
 	startedAt?: Date;
@@ -58,9 +59,11 @@ export interface GameRoom extends Game {
  */
 export interface Player {
 	userId: UserId;
-	client: WebSocket;
+	client?: WebSocket;
 	data: DataValue;
 }
+
+export type GameModes = 'local_pvp' | 'local_bot' | 'online';
 
 /**
  * ---

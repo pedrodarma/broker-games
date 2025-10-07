@@ -1,3 +1,4 @@
+import { QuickTacToeGame } from '@games';
 import { Player, WebSocketMessage } from '@models';
 import { IncomingMessage } from 'http';
 import { WebSocket } from 'ws';
@@ -34,6 +35,7 @@ export function _addNewUser({ ws, req }: Props): Player | undefined {
 			client: ws,
 			data: {
 				symbol: symbol,
+				moves: [],
 			},
 		};
 
@@ -48,28 +50,31 @@ export function _addNewUser({ ws, req }: Props): Player | undefined {
 			},
 		};
 
-		global.games[hash].socketChannel.broadcast?.(joinMessage);
+		// global.games[hash].socketChannel.broadcast?.(joinMessage);
+		// await Actions.join(hash, message);
+		QuickTacToeGame.handleMessage(hash, joinMessage);
 	}
 
-	if (
-		Object.keys(global.games[hash].players).length >=
-		global.games[hash].minPlayers
-	) {
-		const startGame: WebSocketMessage = {
-			type: 'event',
-			from: hash,
-			to: hash,
-			data: {
-				event: 'start',
-				players: Object.keys(global.games[hash].players),
-			},
-		};
+	// if (
+	// 	Object.keys(global.games[hash].players).length >=
+	// 		global.games[hash].minPlayers ||
+	// 	global.games[hash].gameMode !== 'online'
+	// ) {
+	// 	const startGame: WebSocketMessage = {
+	// 		type: 'event',
+	// 		from: hash,
+	// 		to: hash,
+	// 		data: {
+	// 			event: 'start',
+	// 			players: Object.keys(global.games[hash].players),
+	// 		},
+	// 	};
 
-		global.games[hash].socketChannel.broadcast?.(startGame);
-		global.games[hash].status = 'playing';
-		global.games[hash].updatedAt = new Date();
-		global.games[hash].startedAt = new Date();
-	}
+	// 	global.games[hash].socketChannel.broadcast?.(startGame);
+	// 	global.games[hash].status = 'playing';
+	// 	global.games[hash].updatedAt = new Date();
+	// 	global.games[hash].startedAt = new Date();
+	// }
 
 	return global.games[hash].players[playerId];
 }

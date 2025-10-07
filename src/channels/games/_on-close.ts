@@ -27,7 +27,8 @@ interface ClientCloseProps {
 }
 
 export function _onClientClose({ hash, player }: ClientCloseProps) {
-	player.client.close();
+	player.client?.close();
+	global.games[hash].players[player.userId].client = undefined;
 	// eslint-disable-next-line no-console
 	console.log(`Player ${player.userId} disconnected`);
 	// eslint-disable-next-line no-console

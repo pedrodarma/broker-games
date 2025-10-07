@@ -50,6 +50,11 @@ router.get('/', async (req, res) => {
 router.get('/healthcheck', (req, res) => res.sendStatus(200));
 
 router.post('/game/create', express.json(), GameRoomController.create);
+router.post(
+	'/game/create_local',
+	express.json(),
+	GameRoomController.createLocal,
+);
 
 router.get('/game/:gameId', GamesController.get);
 router.get('/games', GamesController.list);
