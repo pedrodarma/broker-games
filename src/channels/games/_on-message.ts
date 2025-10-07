@@ -28,7 +28,7 @@ export function _onMessage({ hash, player, text }: Props) {
 			const message: WebSocketMessage = _formatMessage(formated);
 
 			if (text.toString() === 'ping' || message.type.toLowerCase() === 'ping') {
-				player.client.send('pong');
+				player.client?.send('pong');
 				return;
 			}
 
