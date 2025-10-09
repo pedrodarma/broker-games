@@ -8,12 +8,20 @@ export const QuickTacToeGame = {
 };
 
 async function _handleMessage(hash: string, message: WebSocketMessage) {
-	// Handle incoming messages from players
+	const event =
+		typeof message.data?.event === 'string'
+			? message.data.event.toLowerCase()
+			: undefined;
+
 	switch (message.type) {
 		case 'event':
 			// join, leave, start, end, etc.
-			if (message.data.event === 'join') {
+			if (event === 'join') {
 				await Events.join(hash, message);
+				return;
+			}
+			if (event === 'timeout') {
+				await Events.timeout(hash, message);
 				return;
 			}
 			break;
