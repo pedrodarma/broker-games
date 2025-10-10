@@ -1,4 +1,5 @@
 import { WebSocketMessage } from '@models';
+import { checkDraw, checkWinner } from '../_utils';
 
 export async function _move(hash: string, message: WebSocketMessage) {
 	if (message.from === undefined || message.data?.position === undefined) {
@@ -13,6 +14,8 @@ export async function _move(hash: string, message: WebSocketMessage) {
 	const opponent = Object.values(global.games[hash].players).find(
 		(p) => p.userId !== message.from,
 	);
+
+	if (!opponent) return;
 
 	if (player?.data.moves?.includes(message.data.position)) {
 		// Invalid move: position already taken by the same player
@@ -44,70 +47,10 @@ export async function _move(hash: string, message: WebSocketMessage) {
 
 	global.games[hash].socketChannel.broadcast?.(move);
 
-	// check for win conditions
-	const winner = _winningConditions.find((condition) =>
-		condition.every((pos) =>
-			global.games[hash].players[message.from].data.moves.includes(pos),
-		),
-	);
+	if (checkWinner(hash, message)) return;
 
-	if (winner) {
-		// We have a winner
-		const winMessage: WebSocketMessage = {
-			type: 'event',
-			from: hash,
-			to: hash,
-			data: {
-				event: 'game_over',
-				winner: message.from,
-				winningPositions: winner,
-			},
-		};
+	if (checkDraw(hash)) return;
 
-		global.games[hash].socketChannel.broadcast?.(winMessage);
-		global.games[hash].status = 'finished';
-		global.games[hash].updatedAt = new Date();
-		global.games[hash].finishedAt = new Date();
-		return;
-	}
-
-	// Check for draw
-	const totalMoves = Object.values(global.games[hash].players).reduce(
-		(acc, p) => acc + (p.data.moves?.length || 0),
-		0,
-	);
-
-	if (totalMoves >= 9) {
-		// It's a draw
-		const drawMessage: WebSocketMessage = {
-			type: 'event',
-			from: hash,
-			to: hash,
-			data: {
-				event: 'game_over',
-				winner: null,
-			},
-		};
-
-		global.games[hash].socketChannel.broadcast?.(drawMessage);
-		global.games[hash].status = 'finished';
-		global.games[hash].updatedAt = new Date();
-		global.games[hash].finishedAt = new Date();
-		return;
-	}
-
-	// next turn
-	if (!opponent) return;
-	// global.games[hash].players[opponent.userId].client?.send(
-	// 	JSON.stringify({
-	// 		type: 'event',
-	// 		from: hash,
-	// 		to: opponent.userId,
-	// 		data: {
-	// 			event: 'your_turn',
-	// 		},
-	// 	}),
-	// );
 	global.games[hash].socketChannel.broadcast?.({
 		type: 'event',
 		from: hash,
@@ -144,46 +87,6 @@ export async function _move(hash: string, message: WebSocketMessage) {
 					position: botMovePosition,
 				},
 			});
-		}, 500);
-
-		// setTimeout(() => {
-		// 	global.games[hash].players[opponent.userId].client?.send(
-		// 		JSON.stringify({
-		// 			type: 'event',
-		// 			from: hash,
-		// 			to: opponent.userId,
-		// 			data: {
-		// 				event: 'your_turn',
-		// 			},
-		// 		}),
-		// 	);
-		// }, 1200);
-
-		return;
+		}, 300);
 	}
-	// Object.values(global.games[hash].players)
-	// 	.filter((p) => p.userId !== message.from)
-	// 	.forEach((player) => {
-	// 		global.games[hash].players[player.userId].client.send(
-	// 			JSON.stringify({
-	// 				type: 'event',
-	// 				from: hash,
-	// 				to: player.userId,
-	// 				data: {
-	// 					event: 'your_turn',
-	// 				},
-	// 			}),
-	// 		);
-	// 	});
 }
-
-const _winningConditions = [
-	['a0', 'a1', 'a2'],
-	['b0', 'b1', 'b2'],
-	['c0', 'c1', 'c2'],
-	['a0', 'b0', 'c0'],
-	['a1', 'b1', 'c1'],
-	['a2', 'b2', 'c2'],
-	['a0', 'b1', 'c2'],
-	['a2', 'b1', 'c0'],
-];
