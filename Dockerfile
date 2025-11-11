@@ -3,29 +3,18 @@ FROM node:${NODE_VERSION}-alpine as base
 
 WORKDIR /app
 COPY . .
-RUN rm -rf node_modules package-lock.json dist _website yarn.lock
+RUN rm -rf node_modules package-lock.json dist yarn.lock
 RUN ls -la
 
 FROM base as build
 
-ARG REDIS_HOST
-ARG REDIS_PORT
-ARG REDIS_USERNAME
-ARG REDIS_PASSWORD
+ENV CI=true
 
-ENV REDIS_HOST=${REDIS_HOST}
-ENV REDIS_PORT=${REDIS_PORT}
-ENV REDIS_USERNAME=${REDIS_USERNAME}
-ENV REDIS_PASSWORD=${REDIS_PASSWORD}
-
-RUN ls -la
-RUN yarn install --frozen-lockfile
-RUN ls -la
-RUN yarn build
-RUN ls -la
-
+# RUN yarn install --frozen-lockfile
 # Remove dependências de desenvolvimento
 RUN yarn install --frozen-lockfile --production=true
+
+RUN yarn build
 
 FROM base
 
