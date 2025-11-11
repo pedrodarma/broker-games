@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   app:
-    image: ghcr.io/pedrodarma/broker-games/broker-games:main
+    image: ghcr.io/pedrodarma/broker-games:main
     container_name: broker-games
     environment:
       - NODE_ENV=production

@@ -1,6 +1,7 @@
 import { WebSocket } from 'ws';
 import { Game } from './game.model';
 import { BrokerServer } from './broker-server.model';
+import { GameIDs } from '@constants/game_types';
 
 /**
  * ---
@@ -15,6 +16,7 @@ import { BrokerServer } from './broker-server.model';
  * <br/>&nbsp;<br/>
  */
 export interface GameRoom extends Game {
+	key: GameIDs;
 	/**
 	 * Unique hash identifier for the game room
 	 */
@@ -39,6 +41,7 @@ export interface GameRoom extends Game {
 	 * WebSocket channel for real-time communication within the game room
 	 */
 	socketChannel: BrokerServer;
+	winner?: string;
 	gameMode: GameModes;
 	createdAt: Date;
 	updatedAt: Date;

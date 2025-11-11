@@ -24,6 +24,11 @@ export function _addNewUser({ ws, req }: Props): Player | undefined {
 		return undefined;
 	}
 
+	const game = global.games[hash];
+	if (game && game.status === 'finished') {
+		return undefined;
+	}
+
 	if (isPlayer) {
 		const user = global.users[playerId];
 		const isFirstPlayer = Object.keys(global.games[hash].players).length === 0;
@@ -50,31 +55,8 @@ export function _addNewUser({ ws, req }: Props): Player | undefined {
 			},
 		};
 
-		// global.games[hash].socketChannel.broadcast?.(joinMessage);
-		// await Actions.join(hash, message);
 		QuickTacToeGame.handleMessage(hash, joinMessage);
 	}
-
-	// if (
-	// 	Object.keys(global.games[hash].players).length >=
-	// 		global.games[hash].minPlayers ||
-	// 	global.games[hash].gameMode !== 'online'
-	// ) {
-	// 	const startGame: WebSocketMessage = {
-	// 		type: 'event',
-	// 		from: hash,
-	// 		to: hash,
-	// 		data: {
-	// 			event: 'start',
-	// 			players: Object.keys(global.games[hash].players),
-	// 		},
-	// 	};
-
-	// 	global.games[hash].socketChannel.broadcast?.(startGame);
-	// 	global.games[hash].status = 'playing';
-	// 	global.games[hash].updatedAt = new Date();
-	// 	global.games[hash].startedAt = new Date();
-	// }
 
 	return global.games[hash].players[playerId];
 }

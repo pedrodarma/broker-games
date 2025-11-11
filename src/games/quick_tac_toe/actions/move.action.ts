@@ -1,7 +1,12 @@
 import { WebSocketMessage } from '@models';
 import { checkDraw, checkWinner } from '../_utils';
+import { LogsChannel } from '../../../channels/logs/logs.channel';
 
 export async function _move(hash: string, message: WebSocketMessage) {
+	const game = global.games[hash];
+
+	if (game === undefined || game.status !== 'playing') return;
+
 	if (message.from === undefined || message.data?.position === undefined) {
 		return;
 	}
@@ -45,6 +50,7 @@ export async function _move(hash: string, message: WebSocketMessage) {
 		},
 	};
 
+	LogsChannel.sendLog(game.key, hash, 'move');
 	global.games[hash].socketChannel.broadcast?.(move);
 
 	if (checkWinner(hash, message)) return;

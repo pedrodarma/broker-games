@@ -66,51 +66,7 @@ export class GameRoomController {
 
 			global.games[hash] = {
 				...game,
-				id: gameId,
-				hash: hash,
-				gameMode: gameMode,
-				players: {},
-				watchers: [],
-				status: 'waiting',
-				socketChannel: new WebSocketServer({
-					noServer: true,
-					skipUTF8Validation: true,
-				}),
-				createdAt: new Date(),
-				updatedAt: new Date(),
-			};
-
-			GamesChannel.initialize(hash);
-
-			return res.status(200).json({ id: hash });
-		} catch {
-			return res.status(500).json({ error: 'Internal server error' });
-		}
-	}
-
-	static async createLocal(req: Request, res: Response) {
-		try {
-			const hash = IDUtils.generateShortID();
-
-			if (!req.params.gameId && !req.query.gameId && !req.body.gameId) {
-				return res.status(400).json({ error: 'Game ID is required' });
-			}
-
-			if (!req.params.gameMode && !req.query.gameMode && !req.body.gameMode) {
-				return res.status(400).json({ error: 'Game Mode is required' });
-			}
-
-			const gameId = req.query.gameId || req.params.gameId || req.body.gameId;
-			const gameKey = String(gameId) as keyof typeof games;
-
-			const gameMode =
-				req.query.gameMode || req.params.gameMode || req.body.gameMode;
-
-			const game = games[gameKey];
-			// const id = Number(gameId);
-
-			global.games[hash] = {
-				...game,
+				key: gameKey,
 				id: gameId,
 				hash: hash,
 				gameMode: gameMode,

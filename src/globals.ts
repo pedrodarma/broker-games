@@ -11,6 +11,11 @@ declare global {
 	var globalChatChannel: BrokerServer;
 
 	/**
+	 * WebSocketServer for logs
+	 */
+	var globalLogsChannel: BrokerServer;
+
+	/**
 	 * List of all current games
 	 */
 	var games: Record<string, GameRoom>;
@@ -21,6 +26,11 @@ declare global {
 }
 
 global.globalChatChannel = new WebSocketServer({
+	noServer: true,
+	skipUTF8Validation: true,
+});
+
+global.globalLogsChannel = new WebSocketServer({
 	noServer: true,
 	skipUTF8Validation: true,
 });
