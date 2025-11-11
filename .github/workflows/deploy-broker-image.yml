@@ -15,8 +15,8 @@ jobs:
       REDIS_PASSWORD: ${ { secrets.REDIS_PASSWORD } }
 
     permissions:
-      contents: read
-      packages: write
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v5
