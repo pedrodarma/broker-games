@@ -1,10 +1,10 @@
 {
 	"name": "broker-games",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "WebSocket Message Broker",
 	"main": "index",
 	"scripts": {
-		"postinstall": "./_prepare.sh",
+		"postinstall": "if [ -f ./_prepare.sh ]; then ./_prepare.sh; fi",
 		"start": "node dist/index.js",
 		"dev": "ts-node-dev --inspect --transpile-only --ignore-watch node_modules -r tsconfig-paths/register index.ts",
 		"build": "NODE_ENV=production tsc && tsc-alias",
