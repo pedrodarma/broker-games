@@ -11,9 +11,9 @@ FROM base as build
 ENV CI=true
 ENV YARN_ENABLE_SCRIPTS=false
 
-# RUN yarn install --frozen-lockfile
+RUN YARN_ENABLE_SCRIPTS=false yarn install --frozen-lockfile --ignore-scripts
 # Remove dependências de desenvolvimento
-RUN YARN_ENABLE_SCRIPTS=false yarn install --frozen-lockfile --production=true --ignore-scripts
+# RUN YARN_ENABLE_SCRIPTS=false yarn install --frozen-lockfile --production=true --ignore-scripts
 
 RUN yarn build
 
