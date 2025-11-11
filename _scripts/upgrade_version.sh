@@ -4,7 +4,7 @@ VERSION_REMOTE=$(bash ./_scripts/get_version_remote.sh)
 VERSION_LOCAL=$(bash ./_scripts/get_version_local.sh)
 
 # check if VERSION_REMOTE is empty or hash string
-if [ -z "$VERSION_REMOTE" ] || [[ $VERSION_REMOTE == *""* ]]; then
+if [ -z "$VERSION_REMOTE" ]; then
     echo $VERSION_LOCAL
     exit 0
 fi
