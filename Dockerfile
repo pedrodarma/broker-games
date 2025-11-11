@@ -9,6 +9,7 @@ RUN ls -la
 FROM base as build
 
 ENV CI=true
+ENV YARN_ENABLE_SCRIPTS=false
 
 # RUN yarn install --frozen-lockfile
 # Remove dependências de desenvolvimento
