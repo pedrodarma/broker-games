@@ -1,6 +1,6 @@
 {
 	"name": "broker-games",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "WebSocket Message Broker",
 	"main": "index",
 	"scripts": {
