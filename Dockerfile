@@ -13,7 +13,7 @@ ENV YARN_ENABLE_SCRIPTS=false
 
 # RUN yarn install --frozen-lockfile
 # Remove dependências de desenvolvimento
-RUN yarn install --frozen-lockfile --production=true
+RUN YARN_ENABLE_SCRIPTS=false yarn install --frozen-lockfile --production=true --ignore-scripts
 
 RUN yarn build
 
