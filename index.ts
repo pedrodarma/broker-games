@@ -6,7 +6,7 @@ import { createServer } from 'http';
 import cors from 'cors';
 import { router } from '@routes';
 
-import { ChatChannel } from '@channels';
+import { ChatChannel, LogsChannel } from '@channels';
 
 const app: express.Application = express();
 const server = createServer(app);
@@ -17,6 +17,7 @@ app.set('trust proxy', true);
 app.use('/', router);
 
 const _chatChannel = ChatChannel.initialize();
+const _logsChannel = LogsChannel.initialize();
 
 server.on('upgrade', (request, socket, head) => {
 	const pathname = request.url;
@@ -32,6 +33,13 @@ server.on('upgrade', (request, socket, head) => {
 	if (pathname?.startsWith('/chat')) {
 		_chatChannel.handleUpgrade(request, socket, head, (ws) => {
 			_chatChannel.emit('connection', ws, request);
+		});
+		return;
+	}
+
+	if (pathname?.startsWith('/logs')) {
+		_logsChannel.handleUpgrade(request, socket, head, (ws) => {
+			_logsChannel.emit('connection', ws, request);
 		});
 		return;
 	}

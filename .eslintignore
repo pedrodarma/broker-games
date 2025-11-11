@@ -2,3 +2,4 @@
 **/.bundle/*
 **/.github/*
 **/.vscode/*
+**/dist/*

@@ -1,6 +1,10 @@
 import { WebSocketMessage } from '@models';
 
 export async function _join(hash: string, message: WebSocketMessage) {
+	const game = global.games[hash];
+
+	if (game === undefined || game.status !== 'waiting') return;
+
 	const gameMode = global.games[hash].gameMode;
 	const isAgainstBot = gameMode === 'local_bot';
 	const isLocalPVP = gameMode === 'local_pvp';

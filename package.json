@@ -4,7 +4,7 @@
 	"description": "WebSocket Message Broker",
 	"main": "index",
 	"scripts": {
-		"postinstall": "echo \"./_prepare.sh\"",
+		"postinstall": "./_prepare.sh",
 		"start": "node dist/index.js",
 		"dev": "ts-node-dev --inspect --transpile-only --ignore-watch node_modules -r tsconfig-paths/register index.ts",
 		"build": "NODE_ENV=production tsc && tsc-alias",
