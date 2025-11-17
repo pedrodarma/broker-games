@@ -49,6 +49,9 @@
       "@utils": [
         "./src/utils"
       ],
+      "@services": [
+        "./src/services"
+      ],
       // "@middlewares": ["./src/middlewares"],
       // "@config": ["./src/config"],
       // "@interfaces": ["./src/interfaces"],

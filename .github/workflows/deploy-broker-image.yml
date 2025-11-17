@@ -9,10 +9,7 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     env:
-      REDIS_HOST: ${ { secrets.REDIS_HOST } }
-      REDIS_PORT: ${ { secrets.REDIS_PORT } }
-      REDIS_USERNAME: ${ { secrets.REDIS_USERNAME } }
-      REDIS_PASSWORD: ${ { secrets.REDIS_PASSWORD } }
+      PREDICTION_API_URL: ${ { secrets.PREDICTION_API_URL } }
 
     permissions:
       contents: write

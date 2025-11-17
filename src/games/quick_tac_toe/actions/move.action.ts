@@ -1,6 +1,7 @@
 import { WebSocketMessage } from '@models';
 import { checkDraw, checkWinner } from '../_utils';
 import { LogsChannel } from '../../../channels/logs/logs.channel';
+import { PredictionService } from '@services';
 
 export async function _move(hash: string, message: WebSocketMessage) {
 	const game = global.games[hash];
@@ -67,22 +68,42 @@ export async function _move(hash: string, message: WebSocketMessage) {
 	});
 
 	if (isAgainstBot && !message.from.includes('bot_')) {
-		// Simple bot logic: choose a random available position
-		const allPositions = ['a0', 'a1', 'a2', 'b0', 'b1', 'b2', 'c0', 'c1', 'c2'];
-		const takenPositions = [
-			...global.games[hash].players[message.from].data.moves,
-			...(opponent.data.moves ?? []),
-		];
-		const availablePositions = allPositions.filter(
-			(pos) => !takenPositions.includes(pos),
-		);
+		let botMovePosition: string;
+		try {
+			const xMoves = global.games[hash].players[message.from].data.moves;
+			const oMoves = opponent.data.moves ?? [];
+			const _board = Array(9).fill(0);
+			xMoves.forEach((pos: string) => {
+				_board[boardMapping[pos]] = 1;
+			});
+			oMoves.forEach((pos: string) => {
+				_board[boardMapping[pos]] = -1;
+			});
+			const move = await PredictionService.fetch({
+				game: 'QTT',
+				board: _board,
+				player: -1,
+			});
+			botMovePosition = allPositions[move];
+		} catch {
+			// Simple bot logic: choose a random available position
+			const takenPositions = [
+				...global.games[hash].players[message.from].data.moves,
+				...(opponent.data.moves ?? []),
+			];
+			const availablePositions = allPositions.filter(
+				(pos) => !takenPositions.includes(pos),
+			);
 
-		if (availablePositions.length === 0) {
-			return;
+			if (availablePositions.length === 0) {
+				return;
+			}
+
+			botMovePosition =
+				availablePositions[
+					Math.floor(Math.random() * availablePositions.length)
+				];
 		}
-
-		const botMovePosition =
-			availablePositions[Math.floor(Math.random() * availablePositions.length)];
 		setTimeout(() => {
 			_move(hash, {
 				type: 'action',
@@ -96,3 +117,16 @@ export async function _move(hash: string, message: WebSocketMessage) {
 		}, 300);
 	}
 }
+
+const allPositions = ['a0', 'a1', 'a2', 'b0', 'b1', 'b2', 'c0', 'c1', 'c2'];
+const boardMapping: { [key: string]: number } = {
+	a0: 0,
+	a1: 1,
+	a2: 2,
+	b0: 3,
+	b1: 4,
+	b2: 5,
+	c0: 6,
+	c1: 7,
+	c2: 8,
+};
