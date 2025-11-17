@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.8'
 
 services:
   app:
@@ -6,10 +6,7 @@ services:
     container_name: broker-games
     environment:
       - NODE_ENV=production
-      - REDIS_HOST=${REDIS_HOST:-redis}
-      - REDIS_PORT=${REDIS_PORT:-1118}
-      - REDIS_USERNAME=${REDIS_USERNAME:-admin}
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-default}
+      - PREDICTION_API_URL=${PREDICTION_API_URL:-http://games-ai:8050}
     restart: unless-stopped # options: always, unless-stopped, on-failure
     ports:
       - '8070:8070' # Expose port 8070 on the host
