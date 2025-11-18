@@ -11,6 +11,7 @@ interface Props {
 	game: GameIDs;
 	board: number[];
 	player: number;
+	lastMove: number;
 }
 
 interface APIResponse {
@@ -19,13 +20,25 @@ interface APIResponse {
 	probs: number[];
 }
 
-async function _fetch({ game, board, player }: Props): Promise<number> {
+async function _fetch({
+	game,
+	board,
+	player,
+	lastMove,
+}: Props): Promise<number> {
 	try {
 		const url = `${API_URL}/predict/${game.toLowerCase()}/`;
-		const response = await axios.post<APIResponse>(url, {
-			board: board,
-			player: player,
-		});
+		const response = await axios.post<APIResponse>(
+			url,
+			{
+				board: board,
+				player: player,
+				lastMove: lastMove,
+			},
+			{
+				timeout: 2000,
+			},
+		);
 		const data = response.data;
 		return data.move;
 	} catch (err) {

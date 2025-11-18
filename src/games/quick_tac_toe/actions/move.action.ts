@@ -70,8 +70,9 @@ export async function _move(hash: string, message: WebSocketMessage) {
 	if (isAgainstBot && !message.from.includes('bot_')) {
 		let botMovePosition: string;
 		try {
-			const xMoves = global.games[hash].players[message.from].data.moves;
-			const oMoves = opponent.data.moves ?? [];
+			const xMoves: string[] =
+				global.games[hash].players[message.from].data.moves;
+			const oMoves: string[] = opponent.data.moves ?? [];
 			const _board = Array(9).fill(0);
 			xMoves.forEach((pos: string) => {
 				_board[boardMapping[pos]] = 1;
@@ -79,10 +80,14 @@ export async function _move(hash: string, message: WebSocketMessage) {
 			oMoves.forEach((pos: string) => {
 				_board[boardMapping[pos]] = -1;
 			});
+
+			const lastMove = xMoves[xMoves.length - 1] ?? -1;
+
 			const move = await PredictionService.fetch({
 				game: 'QTT',
 				board: _board,
-				player: -1,
+				player: opponent.data.symbol === 'X' ? 1 : -1,
+				lastMove: boardMapping[lastMove] ?? -1,
 			});
 			botMovePosition = allPositions[move];
 		} catch {
