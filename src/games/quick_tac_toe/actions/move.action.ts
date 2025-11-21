@@ -68,7 +68,50 @@ export async function _move(hash: string, message: WebSocketMessage) {
 	});
 
 	if (isAgainstBot && !message.from.includes('bot_')) {
-		let botMovePosition: string;
+		await _moveBot(hash, message);
+	}
+}
+
+const allPositions = ['a0', 'a1', 'a2', 'b0', 'b1', 'b2', 'c0', 'c1', 'c2'];
+const boardMapping: { [key: string]: number } = {
+	a0: 0,
+	a1: 1,
+	a2: 2,
+	b0: 3,
+	b1: 4,
+	b2: 5,
+	c0: 6,
+	c1: 7,
+	c2: 8,
+};
+
+export async function _moveBot(hash: string, message: WebSocketMessage) {
+	const player = global.games[hash].players[message.from];
+	const opponent = Object.values(global.games[hash].players).find(
+		(p) => p.userId !== message.from,
+	);
+
+	if (!opponent) return;
+
+	let botMovePosition: string;
+	// Simple bot logic: choose a random available position
+	const takenPositions = [
+		...global.games[hash].players[message.from].data.moves,
+		...(opponent.data.moves ?? []),
+	];
+	const availablePositions = allPositions.filter(
+		(pos) => !takenPositions.includes(pos),
+	);
+
+	if (availablePositions.length === 0) {
+		return;
+	}
+
+	if (availablePositions.length === 9) {
+		// If it's the first move, choose a random position
+		botMovePosition =
+			availablePositions[Math.floor(Math.random() * availablePositions.length)];
+	} else {
 		try {
 			const xMoves: string[] =
 				global.games[hash].players[message.from].data.moves;
@@ -91,47 +134,22 @@ export async function _move(hash: string, message: WebSocketMessage) {
 			});
 			botMovePosition = allPositions[move];
 		} catch {
-			// Simple bot logic: choose a random available position
-			const takenPositions = [
-				...global.games[hash].players[message.from].data.moves,
-				...(opponent.data.moves ?? []),
-			];
-			const availablePositions = allPositions.filter(
-				(pos) => !takenPositions.includes(pos),
-			);
-
-			if (availablePositions.length === 0) {
-				return;
-			}
-
 			botMovePosition =
 				availablePositions[
 					Math.floor(Math.random() * availablePositions.length)
 				];
 		}
-		setTimeout(() => {
-			_move(hash, {
-				type: 'action',
-				from: opponent.userId,
-				to: message.from,
-				data: {
-					action: 'move',
-					position: botMovePosition,
-				},
-			});
-		}, 300);
 	}
-}
 
-const allPositions = ['a0', 'a1', 'a2', 'b0', 'b1', 'b2', 'c0', 'c1', 'c2'];
-const boardMapping: { [key: string]: number } = {
-	a0: 0,
-	a1: 1,
-	a2: 2,
-	b0: 3,
-	b1: 4,
-	b2: 5,
-	c0: 6,
-	c1: 7,
-	c2: 8,
-};
+	setTimeout(() => {
+		_move(hash, {
+			type: 'action',
+			from: opponent.userId,
+			to: message.from,
+			data: {
+				action: 'move',
+				position: botMovePosition,
+			},
+		});
+	}, 300);
+}

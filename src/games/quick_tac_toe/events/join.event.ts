@@ -1,4 +1,5 @@
 import { WebSocketMessage } from '@models';
+import { Actions } from '../actions';
 
 export async function _join(hash: string, message: WebSocketMessage) {
 	const game = global.games[hash];
@@ -52,18 +53,35 @@ export async function _join(hash: string, message: WebSocketMessage) {
 		global.games[hash].updatedAt = new Date();
 		global.games[hash].startedAt = new Date();
 
-		// Notify the first player to make a move
-		const firstPlayerId = Object.keys(global.games[hash].players)[0];
-		const firstPlayer = global.games[hash].players[firstPlayerId];
+		// // Notify the first player to make a move
+		// const firstPlayerId = Object.keys(global.games[hash].players)[0];
+		// const firstPlayer = global.games[hash].players[firstPlayerId];
+
+		// const secondPlayerId = Object.keys(global.games[hash].players)[1];
+		// const secondPlayer = global.games[hash].players[secondPlayerId];
+
+		// notify player X to start
+		const playerXId = Object.values(global.games[hash].players).find(
+			(p) => p.data.symbol === 'X',
+		)?.userId;
 
 		global.games[hash].socketChannel.broadcast?.({
 			type: 'event',
 			from: hash,
-			to: firstPlayerId,
+			to: playerXId,
 			data: {
 				event: 'your_turn',
 			},
 		});
+
+		console.log('Game started:', hash);
+		console.log('Players:', {
+			isAgainstBot,
+			playerX: playerXId,
+		});
+		if (isAgainstBot && playerXId?.includes('bot_')) {
+			await Actions.moveBot(hash, message);
+		}
 
 		return;
 	}
@@ -73,12 +91,14 @@ export async function _join(hash: string, message: WebSocketMessage) {
 async function _createBotPlayer(hash: string) {
 	const player = Object.values(global.games[hash].players)[0];
 
+	const symbol = player.data.symbol === 'X' ? 'O' : 'X';
+
 	const botId = `bot_${player.userId}`;
 	global.games[hash].players[botId] = {
 		userId: botId,
 		client: player.client,
 		data: {
-			symbol: 'O',
+			symbol: symbol,
 			isBot: true,
 		},
 	};
@@ -90,7 +110,7 @@ async function _createBotPlayer(hash: string) {
 		data: {
 			event: 'join',
 			player: botId,
-			symbol: 'O',
+			symbol: symbol,
 			players: Object.keys(global.games[hash].players),
 		},
 	};
@@ -101,12 +121,14 @@ async function _createBotPlayer(hash: string) {
 async function _createPlayer2(hash: string) {
 	const player1 = Object.values(global.games[hash].players)[0];
 
+	const symbol = player1.data.symbol === 'X' ? 'O' : 'X';
+
 	const player2Id = `p2_${player1.userId}`;
 	global.games[hash].players[player2Id] = {
 		userId: player2Id,
 		client: player1.client,
 		data: {
-			symbol: 'O',
+			symbol: symbol,
 		},
 	};
 
@@ -117,7 +139,7 @@ async function _createPlayer2(hash: string) {
 		data: {
 			event: 'join',
 			player: player2Id,
-			symbol: 'O',
+			symbol: symbol,
 			players: Object.keys(global.games[hash].players),
 		},
 	};

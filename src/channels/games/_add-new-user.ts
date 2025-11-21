@@ -33,8 +33,8 @@ export function _addNewUser({ ws, req }: Props): Player | undefined {
 		const user = global.users[playerId];
 		const isFirstPlayer = Object.keys(global.games[hash].players).length === 0;
 		const symbol = isFirstPlayer
-			? global.games[hash].players[playerId]?.data?.symbol ?? 'X'
-			: global.games[hash].players[playerId]?.data?.symbol ?? 'O';
+			? global.games[hash].players[playerId]?.data?.symbol ?? 'O'
+			: global.games[hash].players[playerId]?.data?.symbol ?? 'X';
 		global.games[hash].players[playerId] = {
 			userId: user.id,
 			client: ws,
