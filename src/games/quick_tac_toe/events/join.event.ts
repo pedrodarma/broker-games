@@ -74,11 +74,6 @@ export async function _join(hash: string, message: WebSocketMessage) {
 			},
 		});
 
-		console.log('Game started:', hash);
-		console.log('Players:', {
-			isAgainstBot,
-			playerX: playerXId,
-		});
 		if (isAgainstBot && playerXId?.includes('bot_')) {
 			await Actions.moveBot(hash, message);
 		}

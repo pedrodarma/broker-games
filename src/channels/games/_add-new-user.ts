@@ -31,10 +31,8 @@ export function _addNewUser({ ws, req }: Props): Player | undefined {
 
 	if (isPlayer) {
 		const user = global.users[playerId];
-		const isFirstPlayer = Object.keys(global.games[hash].players).length === 0;
-		const symbol = isFirstPlayer
-			? global.games[hash].players[playerId]?.data?.symbol ?? 'O'
-			: global.games[hash].players[playerId]?.data?.symbol ?? 'X';
+		const symbol = _getSymbol(hash, playerId);
+
 		global.games[hash].players[playerId] = {
 			userId: user.id,
 			client: ws,
@@ -59,4 +57,30 @@ export function _addNewUser({ ws, req }: Props): Player | undefined {
 	}
 
 	return global.games[hash].players[playerId];
+}
+
+type Symbols = 'X' | 'O';
+
+function _getSymbol(hash: string, playerId: string): Symbols {
+	const game = global.games[hash];
+	if (!game) {
+		throw new Error('Game not found');
+	}
+
+	const symbols: Symbols[] = ['X', 'O'];
+	const currentSymbol = game.players[playerId]?.data?.symbol;
+
+	if (currentSymbol && symbols.includes(currentSymbol)) {
+		return currentSymbol;
+	}
+
+	const isFirstPlayer = Object.keys(game.players).length === 0;
+	if (!isFirstPlayer) {
+		const firstPlayerSymbol = Object.values(game.players)[0]?.data?.symbol;
+		return firstPlayerSymbol === 'X' ? 'O' : 'X';
+	}
+
+	const randomIndex = Math.floor(Math.random() * symbols.length);
+	const symbol = symbols[randomIndex];
+	return symbol;
 }
