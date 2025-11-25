@@ -14,7 +14,7 @@ export async function _move(hash: string, message: WebSocketMessage) {
 
 	const gameMode = global.games[hash].gameMode;
 	const isAgainstBot = gameMode === 'local_bot';
-	const isLocalPVP = gameMode === 'local_pvp';
+	// const isLocalPVP = gameMode === 'local_pvp';
 
 	const player = global.games[hash].players[message.from];
 	const opponent = Object.values(global.games[hash].players).find(
