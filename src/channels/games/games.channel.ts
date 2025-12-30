@@ -25,7 +25,7 @@ export class GamesChannel {
 			const player = _addNewUser({ ws, req });
 
 			if (player === undefined) {
-				ws.close();
+				ws.close(999);
 				return;
 			}
 

@@ -32,6 +32,7 @@ export function _addNewUser({ ws, req }: Props): Player | undefined {
 
 	if (isPlayer) {
 		const user = global.users[playerId];
+		const player: Player | undefined = global.games[hash].players[playerId];
 
 		global.games[hash].players[playerId] = {
 			userId: user.id,
@@ -42,6 +43,7 @@ export function _addNewUser({ ws, req }: Props): Player | undefined {
 				isReady: false,
 				board: getClearBoard(),
 				targetBoard: getClearBoard(),
+				...player?.data,
 			},
 		};
 
