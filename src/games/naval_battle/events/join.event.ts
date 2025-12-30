@@ -34,56 +34,6 @@ export async function _join(hash: string, message: WebSocketMessage) {
 		await _createBotPlayer(hash);
 	}
 
-	// if (isLocalPVP) {
-	// 	await _createPlayer2(hash);
-	// }
-
-	const totalPlayers = Object.keys(global.games[hash].players).length;
-	if (totalPlayers === global.games[hash].minPlayers) {
-		// const startGame: WebSocketMessage = {
-		// 	type: 'event',
-		// 	from: hash,
-		// 	to: hash,
-		// 	data: {
-		// 		event: 'start',
-		// 		players: Object.values(global.games[hash].players).map((p) => {
-		// 			return { id: p.userId, team: p.data.team, color: p.data.color };
-		// 		}),
-		// 	},
-		// };
-
-		// global.games[hash].socketChannel.broadcast?.(startGame);
-		// global.games[hash].status = 'playing';
-		// global.games[hash].updatedAt = new Date();
-		// global.games[hash].startedAt = new Date();
-
-		// // // Notify the first player to make a move
-		// // const firstPlayerId = Object.keys(global.games[hash].players)[0];
-		// // const firstPlayer = global.games[hash].players[firstPlayerId];
-
-		// // const secondPlayerId = Object.keys(global.games[hash].players)[1];
-		// // const secondPlayer = global.games[hash].players[secondPlayerId];
-
-		// // notify player X to start
-		// const playerXId = Object.values(global.games[hash].players).find(
-		// 	(p) => p.data.symbol === 'X',
-		// )?.userId;
-
-		// global.games[hash].socketChannel.broadcast?.({
-		// 	type: 'event',
-		// 	from: hash,
-		// 	to: playerXId,
-		// 	data: {
-		// 		event: 'your_turn',
-		// 	},
-		// });
-
-		// if (isAgainstBot && playerXId?.includes('bot_')) {
-		// 	await Actions.attackBot(hash, message);
-		// }
-
-		return;
-	}
 	return;
 }
 

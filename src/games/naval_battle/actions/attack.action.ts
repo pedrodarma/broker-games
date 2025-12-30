@@ -16,6 +16,15 @@ export async function _attack(hash: string, message: WebSocketMessage) {
 	const isAgainstBot = gameMode === 'local_bot';
 	// const isLocalPVP = gameMode === 'local_pvp';
 
+	const _row = String(message.data.position)[0].toLocaleLowerCase();
+	const _col = parseInt(String(message.data.position)[1], 10);
+
+	const availableRows = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'];
+	if (!availableRows.includes(_row) || _col < 0 || _col > 9) {
+		// Invalid position
+		return;
+	}
+
 	const player = global.games[hash].players[message.from];
 	const opponent = Object.values(global.games[hash].players).find(
 		(p) => p.userId !== message.from,
@@ -23,53 +32,52 @@ export async function _attack(hash: string, message: WebSocketMessage) {
 
 	if (!opponent) return;
 
-	if (player?.data.moves?.includes(message.data.position)) {
-		// Invalid move: position already taken by the same player
+	const playerBoard = player?.data.board;
+	const playerTargetBoard = player?.data.targetBoard;
+
+	const opponentBoard = opponent.data.board;
+	const opponentTargetBoard = opponent.data.targetBoard;
+
+	if (opponentTargetBoard[_row][_col] !== '-') {
+		// Position already attacked
 		return;
 	}
 
-	if (opponent?.data.moves?.includes(message.data.position)) {
-		// Invalid move: position already taken by the opponent
-		return;
-	}
+	const attackResult = opponentBoard[_row][_col] !== '-' ? 'x' : '*';
 
-	const currentMoves = player?.data?.moves || [];
+	global.games[hash].players[opponent.userId].data.targetBoard[_row][_col] =
+		attackResult;
 
-	global.games[hash].players[message.from].data.moves = [
-		...currentMoves,
-		message.data.position,
-	];
-
-	const move: WebSocketMessage = {
+	const attack: WebSocketMessage = {
 		type: 'action',
 		from: message.from,
 		to: opponent?.userId,
 		data: {
-			action: 'move',
+			action: 'attack',
 			position: message.data.position,
-			symbol: player?.data.symbol,
+			attackResult: attackResult,
 		},
 	};
 
 	// LogsChannel.sendLog(game.key, hash, 'move');
-	// global.games[hash].socketChannel.broadcast?.(move);
+	global.games[hash].socketChannel.broadcast?.(attack);
 
-	// if (checkWinner(hash, message)) return;
+	setTimeout(async () => {
+		global.games[hash].socketChannel.broadcast?.({
+			type: 'event',
+			from: hash,
+			to: opponent.userId,
+			data: {
+				event: 'your_turn',
+			},
+		});
 
-	// if (checkDraw(hash)) return;
-
-	// global.games[hash].socketChannel.broadcast?.({
-	// 	type: 'event',
-	// 	from: hash,
-	// 	to: opponent.userId,
-	// 	data: {
-	// 		event: 'your_turn',
-	// 	},
-	// });
-
-	// if (isAgainstBot && !message.from.includes('bot_')) {
-	// 	await _attackBot(hash, message);
-	// }
+		setTimeout(async () => {
+			if (isAgainstBot && !message.from.includes('bot_')) {
+				await _attackBot(hash, message);
+			}
+		}, 500);
+	}, 1500);
 }
 
 const allPositions = [
@@ -286,54 +294,16 @@ export async function _attackBot(hash: string, message: WebSocketMessage) {
 	if (!opponent) return;
 
 	let botAttackPosition: string;
-	// Simple bot logic: choose a random available position
-	const takenPositions = [
-		...global.games[hash].players[message.from].data.moves,
-		...(opponent.data.moves ?? []),
-	];
-	const availablePositions = allPositions.filter(
-		(pos) => !takenPositions.includes(pos),
-	);
 
-	if (availablePositions.length === 0) {
-		return;
+	while (true) {
+		botAttackPosition = _getRandomPosition(allPositions);
+		const _row = String(botAttackPosition)[0].toLocaleLowerCase();
+		const _col = parseInt(String(botAttackPosition)[1], 10);
+
+		if (player.data.targetBoard[_row][_col] === '-') {
+			break;
+		}
 	}
-
-	botAttackPosition =
-		availablePositions[Math.floor(Math.random() * availablePositions.length)];
-	// if (availablePositions.length === 9) {
-	// 	// If it's the first move, choose a random position
-	// 	botMovePosition =
-	// 		availablePositions[Math.floor(Math.random() * availablePositions.length)];
-	// } else {
-	// 	try {
-	// 		const xMoves: string[] =
-	// 			global.games[hash].players[message.from].data.moves;
-	// 		const oMoves: string[] = opponent.data.moves ?? [];
-	// 		const _board = Array(99).fill(0);
-	// 		xMoves.forEach((pos: string) => {
-	// 			_board[boardMapping[pos]] = 1;
-	// 		});
-	// 		oMoves.forEach((pos: string) => {
-	// 			_board[boardMapping[pos]] = -1;
-	// 		});
-
-	// 		const lastMove = xMoves[xMoves.length - 1] ?? -1;
-
-	// 		const move = await PredictionService.fetch({
-	// 			game: 'NBT',
-	// 			board: _board,
-	// 			player: opponent.data.symbol === 'X' ? 1 : -1,
-	// 			lastMove: boardMapping[lastMove] ?? -1,
-	// 		});
-	// 		botMovePosition = allPositions[move];
-	// 	} catch {
-	// 		botMovePosition =
-	// 			availablePositions[
-	// 				Math.floor(Math.random() * availablePositions.length)
-	// 			];
-	// 	}
-	// }
 
 	setTimeout(() => {
 		_attack(hash, {
@@ -346,4 +316,9 @@ export async function _attackBot(hash: string, message: WebSocketMessage) {
 			},
 		});
 	}, 300);
+}
+
+function _getRandomPosition(availablePositions: string[]): string {
+	const randomIndex = Math.floor(Math.random() * availablePositions.length);
+	return availablePositions[randomIndex];
 }

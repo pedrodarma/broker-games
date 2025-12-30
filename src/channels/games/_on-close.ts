@@ -44,5 +44,16 @@ export function _onClientClose({ hash, player }: ClientCloseProps) {
 				event: 'user_disconnected',
 			},
 		});
+
+		const totalConnected = Object.values(global.games[hash].players).filter(
+			(p) => p.client !== undefined,
+		).length;
+
+		if (totalConnected === 0) {
+			// eslint-disable-next-line no-console
+			console.log(`No players connected. Closing game ${hash}`);
+			global.games[hash].socketChannel.close();
+			delete global.games[hash];
+		}
 	}, 1000);
 }
