@@ -3,14 +3,18 @@ import { Actions } from './actions';
 import { Events } from './events';
 import { _addNewUser } from './_add-new-user';
 
-export const QuickTacToeGame = {
+export const NavalBattleGame = {
 	handleMessage: _handleMessage,
 	addNewUser: _addNewUser,
 };
 
 async function _handleMessage(hash: string, message: WebSocketMessage) {
+	// console.log('NavalBattleGame handleMessage', { hash, message });
 	const event = _getEvent(message);
 	const action = _getAction(message);
+
+	// console.log({ event, action });
+	// console.log({ message });
 
 	switch (message.type) {
 		case 'event':
@@ -19,14 +23,34 @@ async function _handleMessage(hash: string, message: WebSocketMessage) {
 				await Events.join(hash, message);
 				return;
 			}
-			if (event === 'timeout') {
-				await Events.timeout(hash, message);
+			if (event === 'ready') {
+				await Events.ready(hash, message);
 				return;
 			}
+			// if (event === 'timeout') {
+			// 	await Events.timeout(hash, message);
+			// 	return;
+			// }
 			break;
 		case 'action':
-			if (action === 'move') {
-				await Actions.move(hash, message);
+			if (action === 'updateteam') {
+				await Actions.updateTeam(hash, message);
+				return;
+			}
+			if (action === 'updatecolor') {
+				await Actions.updateColor(hash, message);
+				return;
+			}
+			if (action === 'setupboard') {
+				await Actions.setupBoard(hash, message);
+				return;
+			}
+			if (action === 'setisready') {
+				await Actions.setIsReady(hash, message);
+				return;
+			}
+			if (action === 'attack') {
+				await Actions.attack(hash, message);
 				return;
 			}
 			break;

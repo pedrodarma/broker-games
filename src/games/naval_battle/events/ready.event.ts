@@ -1,0 +1,143 @@
+import { WebSocketMessage } from '@models';
+import { Actions } from '../actions';
+
+export async function _ready(hash: string, message: WebSocketMessage) {
+	const game = global.games[hash];
+
+	if (game === undefined || game.status !== 'waiting') return;
+
+	const gameMode = global.games[hash].gameMode;
+	const isAgainstBot = gameMode === 'local_bot';
+	const isLocalPVP = gameMode === 'local_pvp';
+
+	const player = global.games[hash].players[message.from];
+
+	const joinMessage: WebSocketMessage = {
+		type: 'event',
+		from: message.from,
+		to: hash,
+		data: {
+			event: 'join',
+			player: message.from,
+			symbol: player.data.symbol,
+			players: Object.keys(global.games[hash].players),
+		},
+	};
+
+	global.games[hash].socketChannel.broadcast?.(joinMessage);
+
+	if (isAgainstBot) {
+		await _createBotPlayer(hash);
+	}
+
+	if (isLocalPVP) {
+		await _createPlayer2(hash);
+	}
+
+	const totalPlayers = Object.keys(global.games[hash].players).length;
+	if (totalPlayers === global.games[hash].minPlayers) {
+		const startGame: WebSocketMessage = {
+			type: 'event',
+			from: hash,
+			to: hash,
+			data: {
+				event: 'start',
+				players: Object.values(global.games[hash].players).map((p) => {
+					return { id: p.userId, team: p.data.team, color: p.data.color };
+				}),
+			},
+		};
+
+		global.games[hash].socketChannel.broadcast?.(startGame);
+		global.games[hash].status = 'playing';
+		global.games[hash].updatedAt = new Date();
+		global.games[hash].startedAt = new Date();
+
+		// // Notify the first player to make a move
+		// const firstPlayerId = Object.keys(global.games[hash].players)[0];
+		// const firstPlayer = global.games[hash].players[firstPlayerId];
+
+		// const secondPlayerId = Object.keys(global.games[hash].players)[1];
+		// const secondPlayer = global.games[hash].players[secondPlayerId];
+
+		// notify player X to start
+		const playerXId = Object.values(global.games[hash].players).find(
+			(p) => p.data.symbol === 'X',
+		)?.userId;
+
+		global.games[hash].socketChannel.broadcast?.({
+			type: 'event',
+			from: hash,
+			to: playerXId,
+			data: {
+				event: 'your_turn',
+			},
+		});
+
+		if (isAgainstBot && playerXId?.includes('bot_')) {
+			await Actions.attackBot(hash, message);
+		}
+
+		return;
+	}
+	return;
+}
+
+async function _createBotPlayer(hash: string) {
+	const player = Object.values(global.games[hash].players)[0];
+
+	const symbol = player.data.symbol === 'X' ? 'O' : 'X';
+
+	const botId = `bot_${player.userId}`;
+	global.games[hash].players[botId] = {
+		userId: botId,
+		client: player.client,
+		data: {
+			symbol: symbol,
+			isBot: true,
+		},
+	};
+
+	const joinMessage: WebSocketMessage = {
+		type: 'event',
+		from: botId,
+		to: hash,
+		data: {
+			event: 'join',
+			player: botId,
+			symbol: symbol,
+			players: Object.keys(global.games[hash].players),
+		},
+	};
+
+	global.games[hash].socketChannel.broadcast?.(joinMessage);
+}
+
+async function _createPlayer2(hash: string) {
+	const player1 = Object.values(global.games[hash].players)[0];
+
+	const symbol = player1.data.symbol === 'X' ? 'O' : 'X';
+
+	const player2Id = `p2_${player1.userId}`;
+	global.games[hash].players[player2Id] = {
+		userId: player2Id,
+		client: player1.client,
+		data: {
+			symbol: symbol,
+		},
+	};
+
+	const joinMessage: WebSocketMessage = {
+		type: 'event',
+		from: player2Id,
+		to: hash,
+		data: {
+			event: 'join',
+			player: player2Id,
+			symbol: symbol,
+			players: Object.keys(global.games[hash].players),
+		},
+	};
+
+	global.games[hash].socketChannel.broadcast?.(joinMessage);
+}

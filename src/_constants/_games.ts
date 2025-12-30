@@ -25,20 +25,28 @@ export const games: Record<GameIDs, DefaultGame> = {
 		name: _games.NBT,
 		maxPlayers: 2,
 		minPlayers: 2,
+		metadata: {
+			teams: [],
+			colors: [],
+			ships: [],
+		},
 	},
 	RPS: {
 		name: _games.RPS,
 		maxPlayers: 2,
 		minPlayers: 2,
+		metadata: {},
 	},
 	QTT: {
 		name: _games.QTT,
 		maxPlayers: 2,
 		minPlayers: 2,
+		metadata: {},
 	},
 	CNW: {
 		name: _games.CNW,
 		maxPlayers: 10,
 		minPlayers: 2,
+		metadata: {},
 	},
 };

@@ -1,7 +1,7 @@
 import { RawData } from 'ws';
 import '../../globals';
 import { Player, WebSocketMessage } from '@models';
-import { QuickTacToeGame } from '@games';
+import { NavalBattleGame, QuickTacToeGame } from '@games';
 
 interface Props {
 	hash: string;
@@ -36,6 +36,9 @@ export function _onMessage({ hash, player, text }: Props) {
 			switch (gameId.toUpperCase()) {
 				case 'QTT':
 					QuickTacToeGame.handleMessage(hash, message);
+					break;
+				case 'NBT':
+					NavalBattleGame.handleMessage(hash, message);
 					break;
 				default:
 					break;
