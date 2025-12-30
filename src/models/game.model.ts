@@ -13,7 +13,7 @@ export interface Game {
 	id: string;
 	name: string;
 	// images: GameImages;
-	// data: Record<string, DataValue>;
+	metadata: Record<string, any>;
 	maxPlayers: number;
 	minPlayers: number;
 	// createdAt: Date;

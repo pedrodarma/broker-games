@@ -1,7 +1,7 @@
-import { NavalBattleGame, QuickTacToeGame } from '@games';
 import { Player, WebSocketMessage } from '@models';
 import { IncomingMessage } from 'http';
 import { WebSocket } from 'ws';
+import { Events } from './events';
 
 interface Props {
 	ws: WebSocket;
@@ -29,14 +29,6 @@ export function _addNewUser({ ws, req }: Props): Player | undefined {
 		return undefined;
 	}
 
-	if (game.key === 'QTT') {
-		return QuickTacToeGame.addNewUser({ ws, req });
-	}
-
-	if (game.key === 'NBT') {
-		return NavalBattleGame.addNewUser({ ws, req });
-	}
-
 	if (isPlayer) {
 		const user = global.users[playerId];
 		const symbol = _getSymbol(hash, playerId);
@@ -61,7 +53,8 @@ export function _addNewUser({ ws, req }: Props): Player | undefined {
 			},
 		};
 
-		QuickTacToeGame.handleMessage(hash, joinMessage);
+		// QuickTacToeGame.handleMessage(hash, joinMessage);
+		Events.join(hash, joinMessage);
 	}
 
 	return global.games[hash].players[playerId];
