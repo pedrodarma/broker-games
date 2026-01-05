@@ -15,7 +15,25 @@ export class GameRoomController {
 					.json({ error: 'Invalid or missing game room hash' });
 			}
 
-			const gameRoom = global.games[hash];
+			const player = { ...Object.values(global.games[hash].players)[0] };
+			const opponent = { ...Object.values(global.games[hash].players)[1] };
+			const game = { ...global.games[hash] };
+
+			if (game?.socketChannel) {
+				// delete game.socketChannel;
+			}
+			// delete game.players;
+			delete player.client;
+			delete opponent.client;
+
+			const gameRoom = game && {
+				...game,
+				players: {
+					[player.userId]: { ...player },
+					[opponent.userId]: { ...opponent },
+				},
+			};
+			// const gameRoom = global.games[hash];
 
 			if (!gameRoom) {
 				return res.status(404).json({ error: 'Game room not found' });

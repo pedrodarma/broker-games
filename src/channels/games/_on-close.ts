@@ -7,7 +7,7 @@ interface ServerCloseProps {
 }
 
 export function _onServerClose({ hash, restart }: ServerCloseProps) {
-	global.games[hash].socketChannel.close();
+	global.games[hash]?.socketChannel?.close();
 
 	// eslint-disable-next-line no-console
 	console.log('====================================');

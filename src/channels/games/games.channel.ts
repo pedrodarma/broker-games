@@ -22,20 +22,24 @@ export class GamesChannel {
 			_broadcast(hash, message);
 
 		global.games[hash].socketChannel.on('connection', (ws, req) => {
-			const player = _addNewUser({ ws, req });
+			try {
+				const player = _addNewUser({ ws, req });
 
-			if (player === undefined) {
-				ws.close(999);
-				return;
+				if (player === undefined) {
+					ws.close(999);
+					return;
+				}
+
+				ws.on('error', (error) =>
+					_onError({ error, restart: () => GamesChannel.initialize(hash) }),
+				);
+
+				ws.on('message', (text) => _onMessage({ hash, player, text: text }));
+
+				ws.on('close', () => _onClientClose({ hash, player }));
+			} catch (error) {
+				//
 			}
-
-			ws.on('error', (error) =>
-				_onError({ error, restart: () => GamesChannel.initialize(hash) }),
-			);
-
-			ws.on('message', (text) => _onMessage({ hash, player, text: text }));
-
-			ws.on('close', () => _onClientClose({ hash, player }));
 		});
 
 		global.games[hash].socketChannel.on('close', () =>
