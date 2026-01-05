@@ -30,23 +30,43 @@ export async function _setIsReady(hash: string, message: WebSocketMessage) {
 	const bothReady = Object.values(global.games[hash].players).every(
 		(p) => p.data.isReady,
 	);
-	if (bothReady) {
-		// Start the game if both players are ready
-		const startGame: WebSocketMessage = {
-			type: 'event',
-			from: hash,
-			to: hash,
-			data: {
-				event: 'start',
-				players: Object.values(global.games[hash].players).map((p) => {
-					return { id: p.userId, team: p.data.team, color: p.data.color };
-				}),
-			},
-		};
+	if (Object.values(global.games[hash].players).length === 2 && bothReady) {
+		setTimeout(() => {
+			// Start the game if both players are ready
+			const startGame: WebSocketMessage = {
+				type: 'event',
+				from: hash,
+				to: hash,
+				data: {
+					event: 'start',
+					players: Object.values(global.games[hash].players).map((p) => {
+						return { userId: p.userId, team: p.data.team, color: p.data.color };
+					}),
+				},
+			};
 
-		global.games[hash].socketChannel.broadcast?.(startGame);
-		global.games[hash].status = 'playing';
-		global.games[hash].updatedAt = new Date();
-		global.games[hash].startedAt = new Date();
+			global.games[hash].socketChannel.broadcast?.(startGame);
+			global.games[hash].status = 'playing';
+			global.games[hash].updatedAt = new Date();
+			global.games[hash].startedAt = new Date();
+
+			const playerToStart = Object.values(global.games[hash].players)[
+				Math.floor(
+					Math.random() * Object.values(global.games[hash].players).length,
+				)
+			];
+
+			const yourTurnMessage: WebSocketMessage = {
+				type: 'event',
+				from: hash,
+				to: playerToStart.userId,
+				data: {
+					event: 'your_turn',
+				},
+			};
+			setTimeout(() => {
+				global.games[hash].socketChannel.broadcast?.(yourTurnMessage);
+			}, 1000);
+		}, 2000);
 	}
 }

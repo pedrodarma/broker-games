@@ -1,7 +1,4 @@
 import { WebSocketMessage } from '@models';
-import { checkWinner } from '../_utils';
-import { LogsChannel } from '../../../channels/logs/logs.channel';
-import { PredictionService } from '@services';
 
 export async function _attack(hash: string, message: WebSocketMessage) {
 	const game = global.games[hash];
@@ -72,11 +69,11 @@ export async function _attack(hash: string, message: WebSocketMessage) {
 			},
 		});
 
-		setTimeout(async () => {
-			if (isAgainstBot && !message.from.includes('bot_')) {
+		if (isAgainstBot && !message.from.includes('bot_')) {
+			setTimeout(async () => {
 				await _attackBot(hash, message);
-			}
-		}, 500);
+			}, 500);
+		}
 	}, 1500);
 }
 

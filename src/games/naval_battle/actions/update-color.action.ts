@@ -28,6 +28,7 @@ export async function _updateColor(hash: string, message: WebSocketMessage) {
 
 		global.games[hash].socketChannel.broadcast?.(action);
 	} catch (error) {
+		// eslint-disable-next-line no-console
 		console.error('Error in _updateColor:', error);
 	}
 }

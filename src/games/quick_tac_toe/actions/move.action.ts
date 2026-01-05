@@ -86,7 +86,7 @@ const boardMapping: { [key: string]: number } = {
 };
 
 export async function _moveBot(hash: string, message: WebSocketMessage) {
-	const player = global.games[hash].players[message.from];
+	// const player = global.games[hash].players[message.from];
 	const opponent = Object.values(global.games[hash].players).find(
 		(p) => p.userId !== message.from,
 	);

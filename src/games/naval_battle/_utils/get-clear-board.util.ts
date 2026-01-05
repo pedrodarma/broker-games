@@ -1,4 +1,4 @@
-const _cleanBoard: Record<string, string[]> = {
+const _cleanBoard = {
 	a: ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
 	b: ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
 	c: ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
@@ -9,8 +9,9 @@ const _cleanBoard: Record<string, string[]> = {
 	h: ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
 	i: ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
 	j: ['-', '-', '-', '-', '-', '-', '-', '-', '-', '-'],
-};
+} as const;
 
-export function getClearBoard() {
-	return _cleanBoard;
+export function getClearBoard(): Record<string, string[]> {
+	// return { ..._cleanBoard };
+	return JSON.parse(JSON.stringify(_cleanBoard));
 }

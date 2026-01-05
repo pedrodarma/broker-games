@@ -52,7 +52,7 @@ router.get('/healthcheck', (req, res) => res.sendStatus(200));
 router.post('/game/create', express.json(), GameRoomController.create);
 router.get('/game/:hash', GameRoomController.get);
 
-router.get('/game/:gameId', GamesController.get);
+router.get('/game/default/:gameId', GamesController.get);
 router.get('/games', GamesController.list);
 router.get('/games/live', GamesController.listLive);
 
