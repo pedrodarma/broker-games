@@ -72,9 +72,9 @@ export async function _attack(hash: string, message: WebSocketMessage) {
 		if (isAgainstBot && !message.from.includes('bot_')) {
 			setTimeout(async () => {
 				await _attackBot(hash, message);
-			}, 500);
+			}, 2500);
 		}
-	}, 1500);
+	}, 3500);
 }
 
 const allPositions = [
@@ -312,7 +312,7 @@ export async function _attackBot(hash: string, message: WebSocketMessage) {
 				position: botAttackPosition,
 			},
 		});
-	}, 300);
+	}, 3500);
 }
 
 function _getRandomPosition(availablePositions: string[]): string {

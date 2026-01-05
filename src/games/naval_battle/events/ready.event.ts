@@ -60,23 +60,24 @@ export async function _ready(hash: string, message: WebSocketMessage) {
 		// const secondPlayerId = Object.keys(global.games[hash].players)[1];
 		// const secondPlayer = global.games[hash].players[secondPlayerId];
 
-		// notify player X to start
-		const playerXId = Object.values(global.games[hash].players).find(
-			(p) => p.data.symbol === 'X',
-		)?.userId;
+		setTimeout(async () => {
+			const playerXId = Object.values(global.games[hash].players).find(
+				(p) => p.data.symbol === 'X',
+			)?.userId;
 
-		global.games[hash].socketChannel.broadcast?.({
-			type: 'event',
-			from: hash,
-			to: playerXId,
-			data: {
-				event: 'your_turn',
-			},
-		});
+			global.games[hash].socketChannel.broadcast?.({
+				type: 'event',
+				from: hash,
+				to: playerXId,
+				data: {
+					event: 'your_turn',
+				},
+			});
 
-		if (isAgainstBot && playerXId?.includes('bot_')) {
-			await Actions.attackBot(hash, message);
-		}
+			if (isAgainstBot && playerXId?.includes('bot_')) {
+				await Actions.attackBot(hash, message);
+			}
+		}, 1500);
 
 		return;
 	}

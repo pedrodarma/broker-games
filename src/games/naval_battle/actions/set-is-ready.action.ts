@@ -1,5 +1,6 @@
 import { WebSocketMessage } from '@models';
 import { getClearBoard } from '../_utils';
+import { _attackBot } from './attack.action';
 
 export async function _setIsReady(hash: string, message: WebSocketMessage) {
 	const game = global.games[hash];
@@ -50,23 +51,40 @@ export async function _setIsReady(hash: string, message: WebSocketMessage) {
 			global.games[hash].updatedAt = new Date();
 			global.games[hash].startedAt = new Date();
 
-			const playerToStart = Object.values(global.games[hash].players)[
-				Math.floor(
-					Math.random() * Object.values(global.games[hash].players).length,
-				)
-			];
-
-			const yourTurnMessage: WebSocketMessage = {
-				type: 'event',
-				from: hash,
-				to: playerToStart.userId,
-				data: {
-					event: 'your_turn',
-				},
-			};
 			setTimeout(() => {
+				const playerToStart = Object.values(global.games[hash].players)[
+					Math.floor(
+						Math.random() * Object.values(global.games[hash].players).length,
+					)
+				];
+				const opponent = Object.values(global.games[hash].players).find(
+					(p) => p.userId !== playerToStart.userId,
+				);
+
+				const yourTurnMessage: WebSocketMessage = {
+					type: 'event',
+					from: hash,
+					to: playerToStart.userId,
+					data: {
+						event: 'your_turn',
+					},
+				};
+
 				global.games[hash].socketChannel.broadcast?.(yourTurnMessage);
-			}, 1000);
-		}, 2000);
+
+				if (playerToStart.data.isBot) {
+					setTimeout(async () => {
+						await _attackBot(hash, {
+							type: 'action',
+							from: opponent!.userId,
+							to: playerToStart.userId,
+							data: {
+								action: 'attack',
+							},
+						});
+					}, 3500);
+				}
+			}, 2500);
+		}, 3500);
 	}
 }
