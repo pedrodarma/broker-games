@@ -1,16 +1,24 @@
 import { WebSocketMessage } from '@models';
 import { LogsChannel } from '../../../channels/logs/logs.channel';
+import { getTotalShipsCells } from './get-total-ships-cells.util';
 
 export function checkWinner(hash: string, message: WebSocketMessage): boolean {
-	// check for win conditions
-	const winner = _winningConditions.find((condition) =>
-		condition.every((pos) =>
-			global.games[hash].players[message.from].data.moves.includes(pos),
-		),
+	const opponent = Object.values(global.games[hash].players).find(
+		(p) => p.userId !== message.from,
 	);
 
-	if (winner) {
-		// We have a winner
+	const opponentTargetBoard = opponent?.data.targetBoard;
+
+	let totalHits = 0;
+	for (let row = 0; row < opponentTargetBoard.length; row++) {
+		for (let col = 0; col < opponentTargetBoard[row].length; col++) {
+			if (opponentTargetBoard[row][col] === 'x') {
+				totalHits++;
+			}
+		}
+	}
+
+	if (totalHits >= getTotalShipsCells()) {
 		const winMessage: WebSocketMessage = {
 			type: 'event',
 			from: hash,
@@ -18,7 +26,6 @@ export function checkWinner(hash: string, message: WebSocketMessage): boolean {
 			data: {
 				event: 'game_over',
 				winner: message.from,
-				winningPositions: winner,
 			},
 		};
 
@@ -28,20 +35,9 @@ export function checkWinner(hash: string, message: WebSocketMessage): boolean {
 		global.games[hash].updatedAt = new Date();
 		global.games[hash].finishedAt = new Date();
 
-		LogsChannel.sendLog(global.games[hash].key, hash, 'game_over_win');
+		// LogsChannel.sendLog(global.games[hash].key, hash, 'game_over_win');
 		return true;
 	}
 
 	return false;
 }
-
-const _winningConditions = [
-	['a0', 'a1', 'a2'],
-	['b0', 'b1', 'b2'],
-	['c0', 'c1', 'c2'],
-	['a0', 'b0', 'c0'],
-	['a1', 'b1', 'c1'],
-	['a2', 'b2', 'c2'],
-	['a0', 'b1', 'c2'],
-	['a2', 'b1', 'c0'],
-];
