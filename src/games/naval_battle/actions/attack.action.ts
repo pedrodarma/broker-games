@@ -1,4 +1,5 @@
 import { WebSocketMessage } from '@models';
+import { checkWinner } from '../_utils';
 
 export async function _attack(hash: string, message: WebSocketMessage) {
 	const game = global.games[hash];
@@ -59,22 +60,28 @@ export async function _attack(hash: string, message: WebSocketMessage) {
 	// LogsChannel.sendLog(game.key, hash, 'move');
 	global.games[hash].socketChannel.broadcast?.(attack);
 
-	setTimeout(async () => {
-		global.games[hash].socketChannel.broadcast?.({
-			type: 'event',
-			from: hash,
-			to: opponent.userId,
-			data: {
-				event: 'your_turn',
-			},
-		});
+	if (checkWinner(hash, message)) {
+		return;
+	}
 
-		if (isAgainstBot && !message.from.includes('bot_')) {
-			setTimeout(async () => {
-				await _attackBot(hash, message);
-			}, 2500);
-		}
-	}, 3500);
+	if (attackResult !== 'x') {
+		setTimeout(async () => {
+			global.games[hash].socketChannel.broadcast?.({
+				type: 'event',
+				from: hash,
+				to: opponent.userId,
+				data: {
+					event: 'your_turn',
+				},
+			});
+
+			if (isAgainstBot && !message.from.includes('bot_')) {
+				setTimeout(async () => {
+					await _attackBot(hash, message);
+				}, 1000);
+			}
+		}, 2500);
+	}
 }
 
 const allPositions = [
@@ -302,17 +309,17 @@ export async function _attackBot(hash: string, message: WebSocketMessage) {
 		}
 	}
 
-	setTimeout(() => {
-		_attack(hash, {
-			type: 'action',
-			from: opponent.userId,
-			to: message.from,
-			data: {
-				action: 'attack',
-				position: botAttackPosition,
-			},
-		});
-	}, 3500);
+	// setTimeout(() => {
+	_attack(hash, {
+		type: 'action',
+		from: opponent.userId,
+		to: message.from,
+		data: {
+			action: 'attack',
+			position: botAttackPosition,
+		},
+	});
+	// }, 3500);
 }
 
 function _getRandomPosition(availablePositions: string[]): string {
