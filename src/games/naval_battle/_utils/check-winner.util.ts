@@ -7,12 +7,15 @@ export function checkWinner(hash: string, message: WebSocketMessage): boolean {
 		(p) => p.userId !== message.from,
 	);
 
-	const opponentTargetBoard = opponent?.data.targetBoard;
+	const opponentTargetBoard = opponent?.data.targetBoard as Record<
+		string,
+		string[]
+	>;
 
 	let totalHits = 0;
-	for (let row = 0; row < opponentTargetBoard.length; row++) {
-		for (let col = 0; col < opponentTargetBoard[row].length; col++) {
-			if (opponentTargetBoard[row][col] === 'x') {
+	for (const row of Object.values(opponentTargetBoard || {})) {
+		for (const cell of row) {
+			if (cell === 'x') {
 				totalHits++;
 			}
 		}

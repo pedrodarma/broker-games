@@ -64,6 +64,12 @@ export async function _attack(hash: string, message: WebSocketMessage) {
 		return;
 	}
 
+	if (isAgainstBot && message.from.includes('bot_') && attackResult === 'x') {
+		setTimeout(async () => {
+			await _attackBot(hash, { ...message, from: opponent.userId });
+		}, 1000);
+	}
+
 	if (attackResult !== 'x') {
 		setTimeout(async () => {
 			global.games[hash].socketChannel.broadcast?.({
