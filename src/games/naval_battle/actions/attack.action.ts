@@ -41,7 +41,60 @@ export async function _attack(hash: string, message: WebSocketMessage) {
 		return;
 	}
 
-	const attackResult = opponentBoard[_row][_col] !== '-' ? 'x' : '*';
+	// const attackResult = opponentBoard[_row][_col] !== '-' ? 'x' : '*';
+	let attackResult: 'x' | '*';
+
+	const targetCell = opponentBoard[_row][_col];
+
+	if (targetCell !== '-') {
+		attackResult = 'x';
+
+		// marca hit no board real
+		// opponentBoard[_row][_col] = 'x';
+		global.games[hash].players[opponent.userId].data.targetBoard[_row][_col] =
+			'x';
+
+		// verifica se afundou
+		const shipInfo = parseShipCell(targetCell);
+
+		if (shipInfo) {
+			const shipCells = getShipCells(
+				opponentBoard,
+				shipInfo.symbol,
+				shipInfo.shipId,
+			);
+
+			if (
+				isShipSunk(
+					global.games[hash].players[opponent.userId].data.targetBoard,
+					shipCells,
+				)
+			) {
+				markWaterAroundShip(hash, opponent.userId, shipCells);
+
+				// reflete no targetBoard do atacante
+				for (const { r, c } of shipCells) {
+					global.games[hash].players[opponent.userId].data.targetBoard[r][c] =
+						'X';
+				}
+
+				// espelha a água marcada
+				for (const r of Object.keys(opponentBoard)) {
+					for (let c = 0; c < opponentBoard[r].length; c++) {
+						if (opponentBoard[r][c] === '~') {
+							global.games[hash].players[opponent.userId].data.targetBoard[r][
+								c
+							] = '~';
+						}
+					}
+				}
+			}
+		}
+	} else {
+		attackResult = '*';
+		global.games[hash].players[opponent.userId].data.targetBoard[_row][_col] =
+			'*';
+	}
 
 	global.games[hash].players[opponent.userId].data.targetBoard[_row][_col] =
 		attackResult;
@@ -54,6 +107,7 @@ export async function _attack(hash: string, message: WebSocketMessage) {
 			action: 'attack',
 			position: message.data.position,
 			attackResult: attackResult,
+			targetBoard: global.games[hash].players[opponent.userId].data.targetBoard,
 		},
 	};
 
@@ -331,4 +385,64 @@ export async function _attackBot(hash: string, message: WebSocketMessage) {
 function _getRandomPosition(availablePositions: string[]): string {
 	const randomIndex = Math.floor(Math.random() * availablePositions.length);
 	return availablePositions[randomIndex];
+}
+
+function markWaterAroundShip(
+	hash: string,
+	opponentId: string,
+	shipCells: { r: string; c: number }[],
+) {
+	const rows = Object.keys(
+		global.games[hash].players[opponentId].data.targetBoard,
+	);
+	const cols =
+		global.games[hash].players[opponentId].data.targetBoard[rows[0]].length;
+
+	for (const { r, c } of shipCells) {
+		const rowIndex = rows.indexOf(r);
+
+		for (let dr = -1; dr <= 1; dr++) {
+			for (let dc = -1; dc <= 1; dc++) {
+				const nr = rowIndex + dr;
+				const nc = c + dc;
+
+				if (nr < 0 || nr >= rows.length) continue;
+				if (nc < 0 || nc >= cols) continue;
+
+				const rr = rows[nr];
+
+				if (
+					global.games[hash].players[opponentId].data.targetBoard[rr][nc] ===
+					'-'
+				) {
+					global.games[hash].players[opponentId].data.targetBoard[rr][nc] = '~';
+				}
+			}
+		}
+	}
+}
+
+function isShipSunk(board: any, shipCells: { r: string; c: number }[]) {
+	return shipCells.every(({ r, c }) => board[r][c].toLowerCase() === 'x');
+}
+
+function getShipCells(board: any, symbol: string, shipId: string) {
+	const cells: { r: string; c: number }[] = [];
+
+	for (const r of Object.keys(board)) {
+		for (let c = 0; c < board[r].length; c++) {
+			const parsed = parseShipCell(board[r][c]);
+			if (parsed && parsed.symbol === symbol && parsed.shipId === shipId) {
+				cells.push({ r, c });
+			}
+		}
+	}
+
+	return cells;
+}
+
+function parseShipCell(cell: string) {
+	if (!cell || !cell.includes('_')) return null;
+	const [symbol, shipId] = cell.split('_');
+	return { symbol, shipId };
 }

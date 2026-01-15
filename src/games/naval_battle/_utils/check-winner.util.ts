@@ -15,7 +15,7 @@ export function checkWinner(hash: string, message: WebSocketMessage): boolean {
 	let totalHits = 0;
 	for (const row of Object.values(opponentTargetBoard || {})) {
 		for (const cell of row) {
-			if (cell === 'x') {
+			if (cell.toLowerCase() === 'x') {
 				totalHits++;
 			}
 		}
