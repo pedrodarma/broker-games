@@ -7,18 +7,24 @@ interface ServerCloseProps {
 }
 
 export function _onServerClose({ hash, restart }: ServerCloseProps) {
-	global.games[hash]?.socketChannel?.close();
+	try {
+		global.games[hash]?.socketChannel?.close();
 
-	// eslint-disable-next-line no-console
-	console.log('====================================');
-	// eslint-disable-next-line no-console
-	console.log('SERVER CLOSE: ', hash);
-	// eslint-disable-next-line no-console
-	console.log('====================================');
+		// eslint-disable-next-line no-console
+		console.log('====================================');
+		// eslint-disable-next-line no-console
+		console.log('SERVER CLOSE: ', hash);
+		// eslint-disable-next-line no-console
+		console.log('====================================');
 
-	setTimeout(() => {
-		restart();
-	}, 3000);
+		setTimeout(() => {
+			if (global.games[hash] !== undefined) {
+				restart();
+			}
+		}, 3000);
+	} catch {
+		//
+	}
 }
 
 interface ClientCloseProps {
